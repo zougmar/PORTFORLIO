@@ -7,41 +7,50 @@ import os from 'os';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Check if we're in a serverless environment (Vercel)
-const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
-
-// Configure storage based on environment
+// Safely configure storage - default to memory storage to avoid filesystem issues
 let storage;
 
-if (isServerless) {
-  // In serverless, use memory storage (files stored in RAM)
-  // Note: File uploads won't persist - you'll need cloud storage for production
-  storage = multer.memoryStorage();
-  console.log('⚠️ Using memory storage for uploads (serverless environment)');
-} else {
-  // In regular Node.js, use disk storage
-  const uploadsDir = path.join(__dirname, '../uploads');
-  
-  // Ensure uploads directory exists (only in non-serverless)
-  try {
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  // Check if we're in a serverless environment (Vercel)
+  const isServerless = 
+    process.env.VERCEL === '1' || 
+    process.env.VERCEL_URL || 
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env._HANDLER;
+
+  if (isServerless) {
+    // Always use memory storage in serverless
+    storage = multer.memoryStorage();
+    console.log('⚠️ Using memory storage (serverless environment)');
+  } else {
+    // Try to use disk storage in regular Node.js
+    const uploadsDir = path.join(__dirname, '../uploads');
+    try {
+      // Test if we can create/write to directory
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      // If successful, use disk storage
+      storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, uploadsDir);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const ext = path.extname(file.originalname);
+          cb(null, 'cv-' + uniqueSuffix + ext);
+        }
+      });
+    } catch (error) {
+      // Can't use disk, fallback to memory
+      console.warn('⚠️ Cannot use disk storage, falling back to memory:', error.message);
+      storage = multer.memoryStorage();
     }
-  } catch (error) {
-    console.warn('Could not create uploads directory:', error.message);
   }
-  
-  storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-      // Generate unique filename with timestamp
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = path.extname(file.originalname);
-      cb(null, 'cv-' + uniqueSuffix + ext);
-    }
-  });
+} catch (error) {
+  // If anything fails, default to memory storage
+  console.warn('⚠️ Error configuring storage, using memory storage:', error.message);
+  storage = multer.memoryStorage();
 }
 
 // File filter - only allow PDF files
