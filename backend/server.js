@@ -42,16 +42,40 @@ app.use('/uploads', express.static('uploads'));
 
 // MongoDB connection middleware - ensures DB is connected before handling requests
 app.use(async (req, res, next) => {
-  // In serverless, connect on first request
+  // In serverless, ensure connection is established before handling requests
   if (process.env.VERCEL === '1' || process.env.VERCEL_URL) {
     try {
-      // Check if already connected
-      if (mongoose.connection.readyState === 0) {
+      // Check connection state: 0 = disconnected, 1 = connected, 2 = connecting
+      const readyState = mongoose.connection.readyState;
+      
+      if (readyState === 0) {
+        // Not connected, connect now
+        console.log('Connecting to MongoDB...');
+        await connectDB();
+        console.log('✅ MongoDB connected in middleware');
+      } else if (readyState === 2) {
+        // Connection in progress, wait for it
+        console.log('MongoDB connection in progress, waiting...');
+        await new Promise((resolve) => {
+          mongoose.connection.once('connected', resolve);
+          mongoose.connection.once('error', resolve);
+        });
+      } else if (readyState === 1) {
+        // Already connected
+        // Connection is ready
+      }
+      
+      // Double-check connection is ready before proceeding
+      if (mongoose.connection.readyState !== 1) {
+        console.log('Ensuring MongoDB connection...');
         await connectDB();
       }
     } catch (error) {
-      console.error('MongoDB connection error in middleware:', error);
-      // Don't block the request, but log the error
+      console.error('❌ MongoDB connection error in middleware:', error);
+      return res.status(500).json({
+        message: 'Database connection error',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Unable to connect to database'
+      });
     }
   }
   next();
@@ -92,19 +116,47 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) {
+  // If already connected, return immediately
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  // If connection exists in cache, return it
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
+  // If connection is in progress, wait for it
+  if (cached.promise) {
+    try {
+      await cached.promise;
+      if (mongoose.connection.readyState === 1) {
+        cached.conn = mongoose.connection;
+        return cached.conn;
+      }
+    } catch (e) {
+      // Connection failed, reset and try again
+      cached.promise = null;
+    }
+  }
+
+  // Start new connection
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio_db', opts)
-      .then((mongoose) => {
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio_db';
+    
+    if (!mongoUri || mongoUri === 'mongodb://localhost:27017/portfolio_db') {
+      console.warn('⚠️ MONGODB_URI not set, using default (may not work in production)');
+    }
+
+    cached.promise = mongoose.connect(mongoUri, opts)
+      .then((mongooseInstance) => {
         console.log('✅ Connected to MongoDB');
-        return mongoose;
+        cached.conn = mongooseInstance.connection;
+        return cached.conn;
       })
       .catch((error) => {
         console.error('❌ MongoDB connection error:', error);
@@ -115,12 +167,16 @@ async function connectDB() {
 
   try {
     cached.conn = await cached.promise;
+    // Ensure connection is actually ready
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB connection not ready after connect');
+    }
+    return cached.conn;
   } catch (e) {
     cached.promise = null;
+    cached.conn = null;
     throw e;
   }
-
-  return cached.conn;
 }
 
 // Connect to MongoDB (only in non-serverless environments)
