@@ -1,0 +1,164 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "skills": "Compétences",
+    "projects": "Projets",
+    "experience": "Expérience",
+    "contact": "Contact",
+    "admin": "Admin",
+    "login": "Connexion",
+    "logout": "Déconnexion"
+  },
+  "hero": {
+    "greeting": "Bonjour, je suis",
+    "name": "Omar Zouglah",
+    "title": "Développeur Full Stack (MERN Stack) | Ingénieur Logiciel",
+    "location": "Casablanca, Maroc",
+    "description": "Développeur full-stack passionné spécialisé dans le développement MERN stack. Création d'applications web modernes et évolutives avec des technologies de pointe.",
+    "downloadCV": "Télécharger CV",
+    "contactMe": "Me Contacter",
+    "viewWork": "Voir Mon Travail"
+  },
+  "about": {
+    "title": "À propos de moi",
+    "subtitle": "Apprenez à mieux me connaître",
+    "description": "Je suis un développeur Full Stack passionné avec une expertise dans la stack MERN (MongoDB, Express.js, React.js, Node.js). J'aime créer des applications web modernes et évolutives et résoudre des problèmes complexes grâce au code.",
+    "personalInfo": "Informations personnelles",
+    "fullName": "Nom complet",
+    "title": "Titre",
+    "location": "Localisation",
+    "email": "Email",
+    "phone": "Téléphone",
+    "drivingLicense": "Permis de conduire",
+    "languages": "Langues parlées",
+    "education": "Formation",
+    "geeks": {
+      "title": "Geeks Institute – Bootcamp Développement Full Stack",
+      "period": "2025, 2 mois",
+      "description": "Formation intensive MERN Stack couvrant MongoDB, Express.js, React.js, Node.js, API RESTful, authentification JWT et architecture logicielle moderne."
+    },
+    "alx": {
+      "title": "Programme ALX – Ingénierie Logicielle",
+      "period": "2024–2025",
+      "description": "Développement web full-stack avec React.js et Node.js, systèmes distribués et architecture logicielle."
+    },
+    "bachelor": {
+      "title": "Licence en Sciences Mathématiques et Informatiques",
+      "period": "2024",
+      "institution": "Université Multidisciplinaire d'Ouarzazate"
+    },
+    "ofppt": {
+      "title": "Formation en Bureautique",
+      "period": "2023–2024",
+      "institution": "OFPPT"
+    },
+    "baccalaureate": {
+      "title": "Baccalauréat Scientifique",
+      "period": "2018",
+      "institution": "Lycée Sidi Ahmed Bennacer"
+    }
+  },
+  "skills": {
+    "title": "Compétences",
+    "subtitle": "Technologies avec lesquelles je travaille",
+    "language": "Langages de programmation",
+    "framework": "Frameworks et bibliothèques",
+    "database": "Bases de données",
+    "tool": "Outils et technologies"
+  },
+  "projects": {
+    "title": "Projets",
+    "subtitle": "Quelques-uns de mes travaux récents",
+    "viewProject": "Voir le projet",
+    "viewCode": "Voir le code",
+    "featured": "En vedette",
+    "technologies": "Technologies"
+  },
+  "experience": {
+    "title": "Expérience et Formation",
+    "subtitle": "Mon parcours professionnel",
+    "current": "Présent",
+    "teacher": {
+      "title": "Professeur d'Informatique",
+      "company": "Centre de Formation Professionnelle CEFP, Casablanca",
+      "period": "Août 2025 – Présent",
+      "description": "Enseigner Excel et la bureautique. Créer des exercices pratiques et des projets étudiants. Introduire les concepts de base de gestion de données et de tableur."
+    },
+    "internship": {
+      "title": "Stage en Développement Web",
+      "company": "MonarkIT, Marrakech",
+      "period": "Juillet 2023 – Septembre 2023",
+      "description": "Création et déploiement de projets web. Correction de bugs et amélioration des fonctionnalités. Travail sur les tâches front-end et back-end."
+    },
+    "freelancer": {
+      "title": "Technicien Informatique Freelance",
+      "location": "Zagora et Casablanca",
+      "period": "2022 – Présent",
+      "description": "Installation de logiciels et résolution de problèmes informatiques. Configuration de systèmes et amélioration des performances informatiques."
+    },
+    "project": {
+      "title": "Projet de Fin d'Études",
+      "location": "Ouarzazate",
+      "period": "2024",
+      "description": "Création d'un site web pour une entreprise locale. Ajout de fonctionnalités selon les besoins du client."
+    }
+  },
+  "contact": {
+    "title": "Entrer en contact",
+    "subtitle": "Travaillons ensemble",
+    "description": "Je suis toujours ouvert à discuter de nouveaux projets, idées créatives ou opportunités de faire partie de vos visions.",
+    "name": "Votre nom",
+    "email": "Votre email",
+    "subject": "Sujet",
+    "message": "Votre message",
+    "send": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "success": "Message envoyé avec succès !",
+    "error": "Échec de l'envoi du message. Veuillez réessayer."
+  },
+  "admin": {
+    "title": "Tableau de bord administrateur",
+    "projects": "Projets",
+    "skills": "Compétences",
+    "messages": "Messages",
+    "addProject": "Ajouter un projet",
+    "editProject": "Modifier le projet",
+    "deleteProject": "Supprimer le projet",
+    "addSkill": "Ajouter une compétence",
+    "editSkill": "Modifier la compétence",
+    "deleteSkill": "Supprimer la compétence",
+    "viewMessage": "Voir le message",
+    "deleteMessage": "Supprimer le message",
+    "unread": "Non lu",
+    "read": "Lu"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Register",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "loginButton": "Se connecter",
+    "registerButton": "S'inscrire",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "loginSuccess": "Connecté avec succès !",
+    "loginError": "Identifiants invalides",
+    "registerSuccess": "Compte créé avec succès !",
+    "registerError": "Échec de l'inscription"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "back": "Retour"
+  }
+}

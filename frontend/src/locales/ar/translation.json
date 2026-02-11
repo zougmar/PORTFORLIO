@@ -1,0 +1,164 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "about": "نبذة عني",
+    "skills": "المهارات",
+    "projects": "المشاريع",
+    "experience": "الخبرة",
+    "contact": "اتصل بي",
+    "admin": "المسؤول",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج"
+  },
+  "hero": {
+    "greeting": "مرحبا، أنا",
+    "name": "عمر زوغلاح",
+    "title": "مطور Full Stack (MERN Stack) | مهندس برمجيات",
+    "location": "الدار البيضاء، المغرب",
+    "description": "مطور Full Stack شغوف متخصص في تطوير MERN stack. بناء تطبيقات ويب حديثة وقابلة للتطوير باستخدام أحدث التقنيات.",
+    "downloadCV": "تحميل السيرة الذاتية",
+    "contactMe": "اتصل بي",
+    "viewWork": "عرض أعمالي"
+  },
+  "about": {
+    "title": "نبذة عني",
+    "subtitle": "تعرف علي بشكل أفضل",
+    "description": "أنا مطور Full Stack شغوف بخبرة في MERN stack (MongoDB, Express.js, React.js, Node.js). أحب بناء تطبيقات ويب حديثة وقابلة للتطوير وحل المشاكل المعقدة من خلال الكود.",
+    "personalInfo": "المعلومات الشخصية",
+    "fullName": "الاسم الكامل",
+    "title": "المسمى الوظيفي",
+    "location": "الموقع",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "drivingLicense": "رخصة القيادة",
+    "languages": "اللغات المحكية",
+    "education": "التعليم",
+    "geeks": {
+      "title": "معهد Geeks – معسكر تطوير Full Stack",
+      "period": "2025، شهرين",
+      "description": "تدريب مكثف على MERN Stack يغطي MongoDB, Express.js, React.js, Node.js, واجهات برمجة RESTful، المصادقة JWT، والهندسة المعمارية البرمجية الحديثة."
+    },
+    "alx": {
+      "title": "برنامج ALX – هندسة البرمجيات",
+      "period": "2024–2025",
+      "description": "تطوير ويب Full Stack مع React.js و Node.js، الأنظمة الموزعة، وهندسة البرمجيات."
+    },
+    "bachelor": {
+      "title": "بكالوريوس في العلوم الرياضية والحاسوبية",
+      "period": "2024",
+      "institution": "الجامعة متعددة التخصصات ورزازات"
+    },
+    "ofppt": {
+      "title": "تدريب الأتمتة المكتبية",
+      "period": "2023–2024",
+      "institution": "OFPPT"
+    },
+    "baccalaureate": {
+      "title": "البكالوريا العلمية",
+      "period": "2018",
+      "institution": "ثانوية سيدي أحمد بناصر"
+    }
+  },
+  "skills": {
+    "title": "المهارات",
+    "subtitle": "التقنيات التي أعمل بها",
+    "language": "لغات البرمجة",
+    "framework": "الأطر والمكتبات",
+    "database": "قواعد البيانات",
+    "tool": "الأدوات والتقنيات"
+  },
+  "projects": {
+    "title": "المشاريع",
+    "subtitle": "بعض أعمالي الأخيرة",
+    "viewProject": "عرض المشروع",
+    "viewCode": "عرض الكود",
+    "featured": "مميز",
+    "technologies": "التقنيات"
+  },
+  "experience": {
+    "title": "الخبرة والتعليم",
+    "subtitle": "رحلتي المهنية",
+    "current": "حالياً",
+    "teacher": {
+      "title": "مدرس علوم الحاسوب",
+      "company": "مركز التكوين المهني CEFP، الدار البيضاء",
+      "period": "أغسطس 2025 – حالياً",
+      "description": "تدريس Excel والأتمتة المكتبية. إنشاء تمارين عملية ومشاريع طلابية. تقديم مفاهيم أساسية لإدارة البيانات وجداول البيانات."
+    },
+    "internship": {
+      "title": "تدريب تطوير الويب",
+      "company": "MonarkIT، مراكش",
+      "period": "يوليو 2023 – سبتمبر 2023",
+      "description": "بناء ونشر مشاريع ويب. إصلاح الأخطاء وتحسين الميزات. العمل على مهام الواجهة الأمامية والخلفية."
+    },
+    "freelancer": {
+      "title": "فني IT مستقل",
+      "location": "زاكورة والدار البيضاء",
+      "period": "2022 – حالياً",
+      "description": "تثبيت البرامج وإصلاح مشاكل الكمبيوتر. إعداد الأنظمة وتحسين أداء الكمبيوتر."
+    },
+    "project": {
+      "title": "مشروع نهاية الدراسة",
+      "location": "ورزازات",
+      "period": "2024",
+      "description": "بناء موقع ويب لشركة محلية. إضافة ميزات بناءً على احتياجات العميل."
+    }
+  },
+  "contact": {
+    "title": "تواصل معي",
+    "subtitle": "دعنا نعمل معاً",
+    "description": "أنا دائماً منفتح لمناقشة مشاريع جديدة، أفكار إبداعية، أو فرص لأن أكون جزءاً من رؤيتك.",
+    "name": "اسمك",
+    "email": "بريدك الإلكتروني",
+    "subject": "الموضوع",
+    "message": "رسالتك",
+    "send": "إرسال الرسالة",
+    "sending": "جاري الإرسال...",
+    "success": "تم إرسال الرسالة بنجاح!",
+    "error": "فشل إرسال الرسالة. يرجى المحاولة مرة أخرى."
+  },
+  "admin": {
+    "title": "لوحة تحكم المسؤول",
+    "projects": "المشاريع",
+    "skills": "المهارات",
+    "messages": "الرسائل",
+    "addProject": "إضافة مشروع",
+    "editProject": "تعديل المشروع",
+    "deleteProject": "حذف المشروع",
+    "addSkill": "إضافة مهارة",
+    "editSkill": "تعديل المهارة",
+    "deleteSkill": "حذف المهارة",
+    "viewMessage": "عرض الرسالة",
+    "deleteMessage": "حذف الرسالة",
+    "unread": "غير مقروء",
+    "read": "مقروء"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "التسجيل",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "إنشاء حساب",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "loginSuccess": "تم تسجيل الدخول بنجاح!",
+    "loginError": "بيانات اعتماد غير صحيحة",
+    "registerSuccess": "تم إنشاء الحساب بنجاح!",
+    "registerError": "فشل التسجيل"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "close": "إغلاق",
+    "back": "رجوع"
+  }
+}

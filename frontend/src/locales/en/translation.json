@@ -1,0 +1,164 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "hero": {
+    "greeting": "Hello, I'm",
+    "name": "Omar Zouglah",
+    "title": "Full Stack Developer (MERN Stack) | Software Engineer",
+    "location": "Casablanca, Morocco",
+    "description": "Passionate full-stack developer specializing in MERN stack development. Building modern, scalable web applications with cutting-edge technologies.",
+    "downloadCV": "Download CV",
+    "contactMe": "Contact Me",
+    "viewWork": "View My Work"
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Get to know me better",
+    "description": "I'm a passionate Full Stack Developer with expertise in the MERN stack (MongoDB, Express.js, React.js, Node.js). I love building modern, scalable web applications and solving complex problems through code.",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "title": "Title",
+    "location": "Location",
+    "email": "Email",
+    "phone": "Phone",
+    "drivingLicense": "Driving License",
+    "languages": "Languages Spoken",
+    "education": "Education",
+    "geeks": {
+      "title": "Geeks Institute – Full Stack Development Bootcamp",
+      "period": "2025, 2 months",
+      "description": "Intensive MERN Stack training covering MongoDB, Express.js, React.js, Node.js, RESTful APIs, JWT authentication, and modern software architecture."
+    },
+    "alx": {
+      "title": "ALX Program – Software Engineering",
+      "period": "2024–2025",
+      "description": "Full-stack web development with React.js and Node.js, distributed systems, and software architecture."
+    },
+    "bachelor": {
+      "title": "Bachelor's in Mathematical and Computer Sciences",
+      "period": "2024",
+      "institution": "Multidisciplinary University of Ouarzazate"
+    },
+    "ofppt": {
+      "title": "Office Automation Training",
+      "period": "2023–2024",
+      "institution": "OFPPT"
+    },
+    "baccalaureate": {
+      "title": "Scientific Baccalaureate",
+      "period": "2018",
+      "institution": "High School Sidi Ahmed Bennacer"
+    }
+  },
+  "skills": {
+    "title": "Skills",
+    "subtitle": "Technologies I work with",
+    "language": "Programming Languages",
+    "framework": "Frameworks & Libraries",
+    "database": "Databases",
+    "tool": "Tools & Technologies"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Some of my recent work",
+    "viewProject": "View Project",
+    "viewCode": "View Code",
+    "featured": "Featured",
+    "technologies": "Technologies"
+  },
+  "experience": {
+    "title": "Experience & Education",
+    "subtitle": "My professional journey",
+    "current": "Present",
+    "teacher": {
+      "title": "Computer Science Teacher",
+      "company": "Professional Training Center CEFP, Casablanca",
+      "period": "August 2025 – Present",
+      "description": "Teach Excel and office automation. Create practical exercises and student projects. Introduce basic data management and spreadsheet concepts."
+    },
+    "internship": {
+      "title": "Web Development Internship",
+      "company": "MonarkIT, Marrakech",
+      "period": "July 2023 – September 2023",
+      "description": "Built and deployed web projects. Fixed bugs and improved features. Worked on both front-end and back-end tasks."
+    },
+    "freelancer": {
+      "title": "IT Technician Freelancer",
+      "location": "Zagora & Casablanca",
+      "period": "2022 – Present",
+      "description": "Installed software and fixed computer issues. Set up systems and improved computer performance."
+    },
+    "project": {
+      "title": "Final Year Project",
+      "location": "Ouarzazate",
+      "period": "2024",
+      "description": "Built a website for a local company. Added features based on client needs."
+    }
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "subtitle": "Let's work together",
+    "description": "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.",
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Your Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent successfully!",
+    "error": "Failed to send message. Please try again."
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "projects": "Projects",
+    "skills": "Skills",
+    "messages": "Messages",
+    "addProject": "Add Project",
+    "editProject": "Edit Project",
+    "deleteProject": "Delete Project",
+    "addSkill": "Add Skill",
+    "editSkill": "Edit Skill",
+    "deleteSkill": "Delete Skill",
+    "viewMessage": "View Message",
+    "deleteMessage": "Delete Message",
+    "unread": "Unread",
+    "read": "Read"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "loginSuccess": "Logged in successfully!",
+    "loginError": "Invalid credentials",
+    "registerSuccess": "Account created successfully!",
+    "registerError": "Registration failed"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back"
+  }
+}
