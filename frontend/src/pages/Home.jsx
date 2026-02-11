@@ -36,11 +36,10 @@ const Home = () => {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    // If it's a relative path starting with /uploads, construct full backend URL
+    // If it's a relative path starting with /uploads, use relative path (same domain)
+    // In production, both frontend and backend are on same Vercel domain
     if (imagePath.startsWith('/uploads/')) {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const baseURL = API_URL.replace('/api', '');
-      return `${baseURL}${imagePath}`;
+      return imagePath; // Relative path works on same domain
     }
     // Otherwise return as is (for other relative paths)
     return imagePath;
@@ -107,11 +106,11 @@ const Home = () => {
       return;
     }
     
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const backendBaseUrl = API_URL.replace('/api', '');
-    const downloadUrl = cvUrl.startsWith('/') 
-      ? `${backendBaseUrl}${cvUrl}` 
-      : cvUrl;
+    // If it's a relative path, use it as is (same domain in production)
+    // If it's a full URL, use it directly
+    const downloadUrl = cvUrl.startsWith('http://') || cvUrl.startsWith('https://')
+      ? cvUrl
+      : cvUrl; // Relative paths work on same domain
     
     window.open(downloadUrl, '_blank');
     setShowLanguageModal(false);

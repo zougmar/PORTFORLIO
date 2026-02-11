@@ -128,9 +128,6 @@ const AdminDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const token = localStorage.getItem('token');
-
       if (modalType === 'projects' && imageFile) {
         // Use FormData for file upload
         const submitData = new FormData();
@@ -152,21 +149,19 @@ const AdminDashboard = () => {
         // Append image file
         submitData.append('image', imageFile);
 
-        const url = editingItem 
-          ? `${API_URL}/projects/${editingItem._id}`
-          : `${API_URL}/projects`;
-
-        const response = await fetch(url, {
-          method: editingItem ? 'PUT' : 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: submitData
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Error saving project');
+        // Use api utility for file uploads (axios handles FormData)
+        if (editingItem) {
+          await api.put(`/projects/${editingItem._id}`, submitData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        } else {
+          await api.post('/projects', submitData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
         }
 
         toast.success(editingItem ? 'Project updated successfully' : 'Project created successfully');
@@ -210,13 +205,7 @@ const AdminDashboard = () => {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    // If it's a relative path starting with /uploads, construct full backend URL
-    if (imagePath.startsWith('/uploads/')) {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const baseURL = API_URL.replace('/api', '');
-      return `${baseURL}${imagePath}`;
-    }
-    // Otherwise return as is (for other relative paths)
+    // If it's a relative path, use it as is (same domain in production)
     return imagePath;
   };
 
@@ -474,24 +463,17 @@ const AdminDashboard = () => {
                           formData.append('language', 'en');
                           
                           try {
-                            const token = localStorage.getItem('token');
-                            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                            const response = await fetch(`${API_URL}/settings/upload-cv`, {
-                              method: 'POST',
+                            await api.post('/settings/upload-cv', formData, {
                               headers: {
-                                'Authorization': `Bearer ${token}`
-                              },
-                              body: formData
+                                'Content-Type': 'multipart/form-data'
+                              }
                             });
-                            const data = await response.json();
-                            if (!response.ok) {
-                              throw new Error(data.message || 'Upload failed');
-                            }
                             toast.success('English CV uploaded successfully!');
                             fetchData();
                             fileInput.value = '';
                           } catch (error) {
-                            toast.error(error.message || 'Error uploading CV');
+                            const message = error.response?.data?.message || 'Error uploading CV';
+                            toast.error(message);
                             console.error('Error:', error);
                           }
                         }} className="space-y-4">
@@ -517,8 +499,8 @@ const AdminDashboard = () => {
                               <strong>Current English CV:</strong> {settings.cvFileNameEn || 'CV_English.pdf'}
                             </p>
                             <a
-                              href={settings.cvUrlEn.startsWith('/') 
-                                ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${settings.cvUrlEn}`
+                              href={settings.cvUrlEn.startsWith('http://') || settings.cvUrlEn.startsWith('https://')
+                                ? settings.cvUrlEn
                                 : settings.cvUrlEn}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -548,24 +530,17 @@ const AdminDashboard = () => {
                           formData.append('language', 'fr');
                           
                           try {
-                            const token = localStorage.getItem('token');
-                            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-                            const response = await fetch(`${API_URL}/settings/upload-cv`, {
-                              method: 'POST',
+                            await api.post('/settings/upload-cv', formData, {
                               headers: {
-                                'Authorization': `Bearer ${token}`
-                              },
-                              body: formData
+                                'Content-Type': 'multipart/form-data'
+                              }
                             });
-                            const data = await response.json();
-                            if (!response.ok) {
-                              throw new Error(data.message || 'Upload failed');
-                            }
                             toast.success('French CV uploaded successfully!');
                             fetchData();
                             fileInput.value = '';
                           } catch (error) {
-                            toast.error(error.message || 'Error uploading CV');
+                            const message = error.response?.data?.message || 'Error uploading CV';
+                            toast.error(message);
                             console.error('Error:', error);
                           }
                         }} className="space-y-4">
@@ -591,8 +566,8 @@ const AdminDashboard = () => {
                               <strong>Current French CV:</strong> {settings.cvFileNameFr || 'CV_French.pdf'}
                             </p>
                             <a
-                              href={settings.cvUrlFr.startsWith('/') 
-                                ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${settings.cvUrlFr}`
+                              href={settings.cvUrlFr.startsWith('http://') || settings.cvUrlFr.startsWith('https://')
+                                ? settings.cvUrlFr
                                 : settings.cvUrlFr}
                               target="_blank"
                               rel="noopener noreferrer"

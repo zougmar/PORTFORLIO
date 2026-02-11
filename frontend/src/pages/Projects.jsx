@@ -48,13 +48,7 @@ const Projects = () => {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    // If it's a relative path starting with /uploads, construct full backend URL
-    if (imagePath.startsWith('/uploads/')) {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const baseURL = API_URL.replace('/api', '');
-      return `${baseURL}${imagePath}`;
-    }
-    // Otherwise return as is (for other relative paths)
+    // If it's a relative path, use it as is (same domain in production)
     return imagePath;
   };
 
