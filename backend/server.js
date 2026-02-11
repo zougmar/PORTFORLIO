@@ -106,8 +106,11 @@ async function connectDB() {
   return cached.conn;
 }
 
-// Connect to MongoDB
-connectDB().catch(console.error);
+// Connect to MongoDB (only in non-serverless environments)
+// In serverless (Vercel), connection will be established on first request
+if (process.env.VERCEL !== '1') {
+  connectDB().catch(console.error);
+}
 
 // Only start server if not in serverless environment
 if (process.env.VERCEL !== '1') {
