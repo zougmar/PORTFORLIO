@@ -2,12 +2,33 @@
 // Set Vercel environment flag before any imports
 process.env.VERCEL = '1';
 
-// Import the Express app from backend (Vercel includes backend files via includeFiles)
-import appModule from '../backend/server.js';
-const app = appModule.default || appModule;
+// Lazy load the Express app to handle module resolution
+let appPromise = null;
+
+async function getApp() {
+  if (appPromise) return appPromise;
+  
+  appPromise = (async () => {
+    // Try local backend copy first (created by prepare-vercel script)
+    try {
+      const appModule = await import('./backend/server.js');
+      console.log('✅ Express app loaded from api/backend/server.js');
+      return appModule.default || appModule;
+    } catch (error) {
+      console.log('⚠️ Local backend not found, using root backend');
+      // Fallback to root backend
+      const appModule = await import('../backend/server.js');
+      return appModule.default || appModule;
+    }
+  })();
+  
+  return appPromise;
+}
 
 // Vercel serverless function handler
 export default async function handler(req, res) {
+  // Get the Express app (lazy loaded)
+  const app = await getApp();
   // Log request for debugging
   console.log(`[API] ${req.method} ${req.url}`);
   
