@@ -14,8 +14,24 @@ dotenv.config();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : null,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now, adjust as needed
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -51,18 +67,54 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
+// MongoDB connection with caching for serverless
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio_db', opts)
+      .then((mongoose) => {
+        console.log('✅ Connected to MongoDB');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error('❌ MongoDB connection error:', error);
+        cached.promise = null;
+        throw error;
+      });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio_db')
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+connectDB().catch(console.error);
+
+// Only start server if not in serverless environment
+if (process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
   });
+}
 
 export default app;
