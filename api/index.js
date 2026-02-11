@@ -2,7 +2,7 @@
 // Set Vercel environment flag before any imports
 process.env.VERCEL = '1';
 
-// Import the Express app
+// Import the Express app from backend (Vercel includes backend files via includeFiles)
 import appModule from '../backend/server.js';
 const app = appModule.default || appModule;
 

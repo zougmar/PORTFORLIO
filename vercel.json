@@ -1,12 +1,13 @@
 {
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm install && cd frontend && npm install",
+  "installCommand": "npm install && cd api && npm install && cd ../frontend && npm install",
   "framework": "vite",
   "functions": {
-    "api/**/*.js": {
+    "api/index.js": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "backend/**"
     }
   },
   "rewrites": [
