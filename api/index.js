@@ -42,18 +42,8 @@ export default async function handler(req, res) {
   });
   
   try {
-    // Ensure MongoDB is connected (for serverless)
-    if (process.env.VERCEL === '1') {
-      // Import and call connectDB if needed
-      const mongoose = await import('mongoose');
-      if (mongoose.connection.readyState === 0) {
-        console.log('Connecting to MongoDB...');
-        await mongoose.connect(process.env.MONGODB_URI, {
-          bufferCommands: false,
-        });
-        console.log('✅ MongoDB connected');
-      }
-    }
+    // MongoDB connection is handled by the Express app (backend/server.js)
+    // The app will connect on first request if needed
     
     // Handle the request with Express
     return app(req, res);
