@@ -22,7 +22,7 @@
   },
   "about": {
     "title": "À propos de moi",
-    "subtitle": "Apprenez à mieux me connaître",
+    "subtitle": "Découvrez mon parcours et ma passion pour la technologie",
     "description": "Je suis un développeur Full Stack passionné avec une expertise dans la stack MERN (MongoDB, Express.js, React.js, Node.js). J'aime créer des applications web modernes et évolutives et résoudre des problèmes complexes grâce au code.",
     "personalInfo": "Informations personnelles",
     "fullName": "Nom complet",

@@ -91,6 +91,28 @@ router.get('/:id', protect, admin, async (req, res, next) => {
   }
 });
 
+// @route   PUT /api/messages/:id
+// @desc    Update message (e.g., mark as read/unread)
+// @access  Private/Admin
+router.put('/:id', protect, admin, async (req, res, next) => {
+  try {
+    const message = await Message.findById(req.params.id);
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+    
+    // Update read status if provided
+    if (req.body.read !== undefined) {
+      message.read = req.body.read;
+    }
+    
+    await message.save();
+    res.json(message);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // @route   DELETE /api/messages/:id
 // @desc    Delete message
 // @access  Private/Admin

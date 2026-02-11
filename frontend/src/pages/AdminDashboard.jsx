@@ -16,7 +16,11 @@ import {
   FiMail,
   FiFileText,
   FiLogOut,
-  FiHome
+  FiHome,
+  FiClock,
+  FiUser,
+  FiCheckCircle,
+  FiCircle
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -44,6 +48,8 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -196,6 +202,53 @@ const AdminDashboard = () => {
     logout();
     navigate('/');
     toast.success('Logged out successfully');
+  };
+
+  const handleViewMessage = async (message) => {
+    setSelectedMessage(message);
+    setShowMessageModal(true);
+    
+    // Mark as read when viewing
+    if (!message.read) {
+      try {
+        await api.put(`/messages/${message._id}`, { read: true });
+        // Update local state
+        setMessages(messages.map(msg => 
+          msg._id === message._id ? { ...msg, read: true } : msg
+        ));
+      } catch (error) {
+        console.error('Error marking message as read:', error);
+      }
+    }
+  };
+
+  const handleToggleReadStatus = async (messageId, currentStatus) => {
+    try {
+      await api.put(`/messages/${messageId}`, { read: !currentStatus });
+      // Update local state
+      setMessages(messages.map(msg => 
+        msg._id === messageId ? { ...msg, read: !currentStatus } : msg
+      ));
+      // Update selected message if it's the one being toggled
+      if (selectedMessage && selectedMessage._id === messageId) {
+        setSelectedMessage({ ...selectedMessage, read: !currentStatus });
+      }
+      toast.success(`Message marked as ${!currentStatus ? 'read' : 'unread'}`);
+    } catch (error) {
+      toast.error('Error updating message status');
+      console.error('Error:', error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   // Helper function to get full image URL
@@ -585,51 +638,272 @@ const AdminDashboard = () => {
                 {/* Messages Tab */}
                 {activeTab === 'messages' && (
                   <div>
-                    <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{t('admin.messages')}</h2>
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <div
-                          key={message._id}
-                          className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-l-4 ${
-                            message.read
-                              ? 'border-gray-300 dark:border-gray-600'
-                              : 'border-primary-600'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{message.name}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">{message.email}</p>
-                            </div>
-                            <span
-                              className={`px-2 py-1 rounded text-xs ${
-                                message.read
-                                  ? 'bg-gray-200 dark:bg-gray-700'
-                                  : 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400'
-                              }`}
-                            >
-                              {message.read ? t('admin.read') : t('admin.unread')}
-                            </span>
-                          </div>
-                          <p className="font-semibold mb-2 text-gray-900 dark:text-white">{message.subject}</p>
-                          <p className="text-gray-600 dark:text-gray-400 mb-4">{message.message}</p>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleDelete(message._id, 'messages')}
-                              className="p-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
-                            >
-                              <FiTrash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.messages')}</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          {messages.filter(m => !m.read).length} unread message{messages.filter(m => !m.read).length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
                     </div>
+                    
+                    {messages.length === 0 ? (
+                      <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                        <FiMail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">No messages yet</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {messages.map((message) => (
+                          <motion.div
+                            key={message._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 transition-all cursor-pointer hover:shadow-lg ${
+                              message.read
+                                ? 'border-gray-300 dark:border-gray-600'
+                                : 'border-primary-600 bg-primary-50/50 dark:bg-primary-900/20'
+                            }`}
+                            onClick={() => handleViewMessage(message)}
+                          >
+                            <div className="p-5">
+                              <div className="flex justify-between items-start mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    {!message.read && (
+                                      <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
+                                    )}
+                                    <h3 className={`text-lg font-bold ${message.read ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white'}`}>
+                                      {message.name}
+                                    </h3>
+                                  </div>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-1">
+                                    <FiMail className="w-3 h-3" />
+                                    <span>{message.email}</span>
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 ${
+                                      message.read
+                                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                        : 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                                    }`}
+                                  >
+                                    {message.read ? (
+                                      <>
+                                        <FiCheckCircle className="w-3 h-3" />
+                                        <span>{t('admin.read')}</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <FiCircle className="w-3 h-3" />
+                                        <span>{t('admin.unread')}</span>
+                                      </>
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div className="mb-3">
+                                <p className="font-semibold text-gray-900 dark:text-white mb-2">{message.subject}</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                                  {message.message}
+                                </p>
+                              </div>
+                              
+                              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <div className="flex items-center space-x-1">
+                                  <FiClock className="w-3 h-3" />
+                                  <span>{formatDate(message.createdAt)}</span>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(message._id, 'messages');
+                                  }}
+                                  className="p-1.5 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                                  title="Delete message"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
           </div>
         </main>
+
+        {/* Message Detail Modal */}
+        <AnimatePresence>
+          {showMessageModal && selectedMessage && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              >
+                <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start z-10">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="p-2 bg-primary-100 dark:bg-primary-900 rounded-lg">
+                        <FiMail className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Message Details</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {formatDate(selectedMessage.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleToggleReadStatus(selectedMessage._id, selectedMessage.read)}
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-2 ${
+                        selectedMessage.read
+                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          : 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800'
+                      }`}
+                    >
+                      {selectedMessage.read ? (
+                        <>
+                          <FiCircle className="w-4 h-4" />
+                          <span>Mark as Unread</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle className="w-4 h-4" />
+                          <span>Mark as Read</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowMessageModal(false);
+                        setSelectedMessage(null);
+                      }}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                    >
+                      <FiX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  {/* Status Badge */}
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 ${
+                        selectedMessage.read
+                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          : 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                      }`}
+                    >
+                      {selectedMessage.read ? (
+                        <>
+                          <FiCheckCircle className="w-4 h-4" />
+                          <span>{t('admin.read')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCircle className="w-4 h-4" />
+                          <span>{t('admin.unread')}</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Sender Information */}
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-5">
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">
+                      Sender Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <FiUser className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Name</p>
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">{selectedMessage.name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <FiMail className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                          <a
+                            href={`mailto:${selectedMessage.email}`}
+                            className="text-lg font-semibold text-primary-600 dark:text-primary-400 hover:underline"
+                          >
+                            {selectedMessage.email}
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <FiClock className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300">{formatDate(selectedMessage.createdAt)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subject */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                      Subject
+                    </h3>
+                    <p className="text-xl font-bold text-gray-900 dark:text-white">{selectedMessage.subject}</p>
+                  </div>
+
+                  {/* Message Content */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wide">
+                      Message
+                    </h3>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-5">
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        {selectedMessage.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this message?')) {
+                          handleDelete(selectedMessage._id, 'messages');
+                          setShowMessageModal(false);
+                          setSelectedMessage(null);
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center space-x-2"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      <span>Delete Message</span>
+                    </button>
+                    <a
+                      href={`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`}
+                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
+                    >
+                      <FiMail className="w-4 h-4" />
+                      <span>Reply</span>
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Modal */}
         {showModal && (

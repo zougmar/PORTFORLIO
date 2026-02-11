@@ -9,6 +9,10 @@ const portfolioSettingsSchema = new mongoose.Schema({
     type: String,
     default: 'CV_Omar_Zouglah_English.pdf'
   },
+  cvFileDataEn: {
+    type: Buffer,
+    default: null
+  },
   cvUrlFr: {
     type: String,
     default: ''
@@ -16,6 +20,10 @@ const portfolioSettingsSchema = new mongoose.Schema({
   cvFileNameFr: {
     type: String,
     default: 'CV_Omar_Zouglah_French.pdf'
+  },
+  cvFileDataFr: {
+    type: Buffer,
+    default: null
   }
 }, {
   timestamps: true

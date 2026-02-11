@@ -17,7 +17,14 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const settings = await PortfolioSettings.getSettings();
-    res.json(settings);
+    // Exclude file buffers from response (too large)
+    const settingsResponse = {
+      cvUrlEn: settings.cvUrlEn || '',
+      cvFileNameEn: settings.cvFileNameEn || '',
+      cvUrlFr: settings.cvUrlFr || '',
+      cvFileNameFr: settings.cvFileNameFr || ''
+    };
+    res.json(settingsResponse);
   } catch (error) {
     next(error);
   }
@@ -56,32 +63,32 @@ router.post('/upload-cv', protect, admin, upload.single('cv'), async (req, res, 
     const { language } = req.body; // 'en' or 'fr'
     
     if (!language || !['en', 'fr'].includes(language)) {
-      // Delete uploaded file if language is invalid
-      const filePath = path.join(__dirname, '../uploads', req.file.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
       return res.status(400).json({ message: 'Language must be "en" or "fr"' });
     }
 
     // Get current settings
     let settings = await PortfolioSettings.findOne();
     
-    // Delete old CV file if exists
-    const cvField = language === 'en' ? 'cvUrlEn' : 'cvUrlFr';
-    if (settings && settings[cvField] && settings[cvField].startsWith('/uploads/')) {
-      const oldFilePath = path.join(__dirname, '../', settings[cvField]);
-      if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath);
-      }
-    }
-
-    // Update settings with new CV URL
-    const cvUrl = `/uploads/${req.file.filename}`;
+    // Generate unique filename
+    const timestamp = Date.now();
+    const sanitizedOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const uniqueFilename = `cv_${language}_${timestamp}_${sanitizedOriginalName}`;
+    
+    // Store file buffer in database and create URL endpoint
+    const cvUrl = `/api/settings/cv/${language}`;
     const cvFileName = req.file.originalname;
+    
     const updateData = language === 'en' 
-      ? { cvUrlEn: cvUrl, cvFileNameEn: cvFileName }
-      : { cvUrlFr: cvUrl, cvFileNameFr: cvFileName };
+      ? { 
+          cvUrlEn: cvUrl, 
+          cvFileNameEn: cvFileName,
+          cvFileDataEn: req.file.buffer
+        }
+      : { 
+          cvUrlFr: cvUrl, 
+          cvFileNameFr: cvFileName,
+          cvFileDataFr: req.file.buffer
+        };
 
     if (!settings) {
       settings = await PortfolioSettings.create(updateData);
@@ -95,16 +102,43 @@ router.post('/upload-cv', protect, admin, upload.single('cv'), async (req, res, 
 
     res.json({
       message: `CV (${language.toUpperCase()}) uploaded successfully`,
-      ...updateData
+      cvUrlEn: settings.cvUrlEn,
+      cvFileNameEn: settings.cvFileNameEn,
+      cvUrlFr: settings.cvUrlFr,
+      cvFileNameFr: settings.cvFileNameFr
     });
   } catch (error) {
-    // Delete uploaded file if there's an error
-    if (req.file) {
-      const filePath = path.join(__dirname, '../uploads', req.file.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+    next(error);
+  }
+});
+
+// @route   GET /api/settings/cv/:language
+// @desc    Download CV file (English or French)
+// @access  Public
+router.get('/cv/:language', async (req, res, next) => {
+  try {
+    const { language } = req.params;
+    
+    if (!['en', 'fr'].includes(language)) {
+      return res.status(400).json({ message: 'Language must be "en" or "fr"' });
     }
+
+    const settings = await PortfolioSettings.getSettings();
+    const fileData = language === 'en' ? settings.cvFileDataEn : settings.cvFileDataFr;
+    const fileName = language === 'en' ? settings.cvFileNameEn : settings.cvFileNameFr;
+
+    if (!fileData || !fileData.length) {
+      return res.status(404).json({ message: `CV (${language.toUpperCase()}) not found` });
+    }
+
+    // Set headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName || `CV_${language.toUpperCase()}.pdf`}"`);
+    res.setHeader('Content-Length', fileData.length);
+
+    // Send the file buffer
+    res.send(fileData);
+  } catch (error) {
     next(error);
   }
 });
