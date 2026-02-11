@@ -7,16 +7,27 @@ const getApiUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // In production on Vercel, use relative path (same domain)
-  if (import.meta.env.PROD) {
+  // Check if we're in production (not localhost)
+  const isProduction = typeof window !== 'undefined' && 
+    !window.location.hostname.includes('localhost') && 
+    !window.location.hostname.includes('127.0.0.1');
+  
+  // Also check Vite's PROD flag as fallback
+  const isViteProd = import.meta.env.PROD === true || import.meta.env.MODE === 'production';
+  
+  // In production (Vercel), use relative path (same domain)
+  if (isProduction || isViteProd) {
+    console.log('🌐 Using production API URL: /api');
     return '/api';
   }
   
   // Development: use localhost
+  console.log('🔧 Using development API URL: http://localhost:5000/api');
   return 'http://localhost:5000/api';
 };
 
 const API_URL = getApiUrl();
+console.log('📡 API Base URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
