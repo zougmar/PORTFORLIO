@@ -40,6 +40,23 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));
 
+// MongoDB connection middleware - ensures DB is connected before handling requests
+app.use(async (req, res, next) => {
+  // In serverless, connect on first request
+  if (process.env.VERCEL === '1' || process.env.VERCEL_URL) {
+    try {
+      // Check if already connected
+      if (mongoose.connection.readyState === 0) {
+        await connectDB();
+      }
+    } catch (error) {
+      console.error('MongoDB connection error in middleware:', error);
+      // Don't block the request, but log the error
+    }
+  }
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
