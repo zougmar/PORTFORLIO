@@ -41,7 +41,11 @@ const AdminDashboard = () => {
     cvUrlEn: '', 
     cvFileNameEn: '', 
     cvUrlFr: '', 
-    cvFileNameFr: '' 
+    cvFileNameFr: '',
+    professionalSummary: '',
+    professionalSummaryFr: '',
+    professionalSummaryAr: '',
+    services: []
   });
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -84,7 +88,7 @@ const AdminDashboard = () => {
       } else if (activeTab === 'messages') {
         const response = await api.get('/messages');
         setMessages(response.data);
-      } else if (activeTab === 'cv') {
+      } else if (activeTab === 'cv' || activeTab === 'summary') {
         const response = await api.get('/settings');
         setSettings(response.data);
       }
@@ -278,7 +282,8 @@ const AdminDashboard = () => {
     { id: 'projects', label: t('admin.projects'), icon: FiBriefcase },
     { id: 'skills', label: t('admin.skills'), icon: FiCode },
     { id: 'messages', label: t('admin.messages'), icon: FiMail },
-    { id: 'cv', label: 'CV Management', icon: FiFileText }
+    { id: 'cv', label: 'CV Management', icon: FiFileText },
+    { id: 'summary', label: 'Professional Summary', icon: FiUser }
   ];
 
   return (

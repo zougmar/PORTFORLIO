@@ -17,6 +17,12 @@ const Home = () => {
   const [projects, setProjects] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [portfolioSettings, setPortfolioSettings] = useState({
+    professionalSummary: '',
+    professionalSummaryFr: '',
+    professionalSummaryAr: '',
+    services: []
+  });
   const [contactFormData, setContactFormData] = useState({
     name: '',
     email: '',
@@ -66,6 +72,12 @@ const Home = () => {
       setCvSettings({
         cvUrlEn: response.data.cvUrlEn || '',
         cvUrlFr: response.data.cvUrlFr || ''
+      });
+      setPortfolioSettings({
+        professionalSummary: response.data.professionalSummary || '',
+        professionalSummaryFr: response.data.professionalSummaryFr || '',
+        professionalSummaryAr: response.data.professionalSummaryAr || '',
+        services: response.data.services || []
       });
     } catch (error) {
       console.error('Error fetching CV settings:', error);
@@ -402,6 +414,85 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Professional Summary Section */}
+      {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr || (portfolioSettings.services && portfolioSettings.services.length > 0)) && (
+        <section id="professional-summary" className="section-padding bg-white dark:bg-gray-900">
+          <div className="container-custom">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">Professional Summary</h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">What I Offer</p>
+            </motion.div>
+
+            {/* Professional Summary Text */}
+            {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="max-w-4xl mx-auto mb-12"
+              >
+                <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-8 shadow-lg">
+                  <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                    {i18n.language === 'fr' && portfolioSettings.professionalSummaryFr
+                      ? portfolioSettings.professionalSummaryFr
+                      : i18n.language === 'ar' && portfolioSettings.professionalSummaryAr
+                      ? portfolioSettings.professionalSummaryAr
+                      : portfolioSettings.professionalSummary}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Services Grid */}
+            {portfolioSettings.services && portfolioSettings.services.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {portfolioSettings.services.map((service, index) => {
+                  const getServiceTitle = () => {
+                    if (i18n.language === 'fr' && service.titleFr) return service.titleFr;
+                    if (i18n.language === 'ar' && service.titleAr) return service.titleAr;
+                    return service.title;
+                  };
+
+                  const getServiceDescription = () => {
+                    if (i18n.language === 'fr' && service.descriptionFr) return service.descriptionFr;
+                    if (i18n.language === 'ar' && service.descriptionAr) return service.descriptionAr;
+                    return service.description;
+                  };
+
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border-l-4 border-primary-600"
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className="text-4xl flex-shrink-0">{service.icon || '📘'}</div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
+                            {getServiceTitle()}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            {getServiceDescription()}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Projects Section */}
       <section id="projects" className="section-padding bg-white dark:bg-gray-900">

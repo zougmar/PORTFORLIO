@@ -74,6 +74,7 @@ const Navbar = () => {
   const navLinks = [
     { id: 'home', label: t('nav.home'), action: () => scrollToSection('home') },
     { id: 'about', label: t('nav.about'), action: () => scrollToSection('about') },
+    { id: 'professional-summary', label: 'Services', action: () => scrollToSection('professional-summary') },
     { id: 'skills', label: t('nav.skills'), action: () => scrollToSection('skills') },
     { id: 'projects', label: t('nav.projects'), action: () => scrollToSection('projects') },
     { id: 'experience', label: t('nav.experience'), action: () => scrollToSection('experience') },
