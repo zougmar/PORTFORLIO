@@ -48,10 +48,10 @@ const Login = () => {
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
-        {/* Return to Home Link - Top Right */}
+        {/* Return to Home Link - Top Left */}
         <Link
           to="/"
-          className="absolute top-6 right-6 flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-md hover:shadow-lg"
+          className="absolute top-6 left-6 flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-md hover:shadow-lg"
         >
           <FiArrowLeft className="w-4 h-4" />
           <span className="text-sm font-medium">Return to Home</span>
