@@ -31,6 +31,10 @@ const projectSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  imageData: {
+    type: Buffer,
+    default: null
+  },
   technologies: [{
     type: String,
     trim: true

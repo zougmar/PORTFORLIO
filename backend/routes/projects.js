@@ -3,12 +3,6 @@ import { body, validationResult } from 'express-validator';
 import Project from '../models/Project.js';
 import { protect, admin } from '../middleware/auth.js';
 import uploadImage from '../middleware/uploadImage.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -17,8 +11,44 @@ const router = express.Router();
 // @access  Public
 router.get('/', async (req, res, next) => {
   try {
-    const projects = await Project.find().sort({ order: 1, createdAt: -1 });
-    res.json(projects);
+    const projects = await Project.find().select('-imageData').sort({ order: 1, createdAt: -1 });
+    // Get projects with image data to check which have images
+    const projectsWithImages = await Project.find().select('_id imageData').lean();
+    const imageMap = new Map();
+    projectsWithImages.forEach(p => {
+      if (p.imageData && p.imageData.length) {
+        imageMap.set(p._id.toString(), true);
+      }
+    });
+    
+    // Add image URLs to projects that have images
+    const projectsWithImageUrls = projects.map(project => {
+      const projectObj = project.toObject();
+      if (imageMap.has(project._id.toString())) {
+        projectObj.image = `/api/projects/${project._id}/image`;
+      }
+      return projectObj;
+    });
+    res.json(projectsWithImageUrls);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/projects/:id/image
+// @desc    Get project image
+// @access  Public
+router.get('/:id/image', async (req, res, next) => {
+  try {
+    const project = await Project.findById(req.params.id).select('imageData');
+    if (!project || !project.imageData || !project.imageData.length) {
+      return res.status(404).json({ message: 'Project image not found' });
+    }
+
+    // Determine content type (default to jpeg)
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.send(project.imageData);
   } catch (error) {
     next(error);
   }
@@ -29,11 +59,17 @@ router.get('/', async (req, res, next) => {
 // @access  Public
 router.get('/:id', async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id).select('-imageData');
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    res.json(project);
+    // Add image URL if image exists
+    const projectObj = project.toObject();
+    const projectWithImage = await Project.findById(req.params.id).select('imageData');
+    if (projectWithImage && projectWithImage.imageData && projectWithImage.imageData.length) {
+      projectObj.image = `/api/projects/${project._id}/image`;
+    }
+    res.json(projectObj);
   } catch (error) {
     next(error);
   }
@@ -50,10 +86,7 @@ router.post('/', protect, admin, uploadImage.single('image'), [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // If validation fails and file was uploaded, delete it
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
+      // With memory storage, no file to delete
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -73,18 +106,25 @@ router.post('/', protect, admin, uploadImage.single('image'), [
       }
     }
     
-    // If image was uploaded, set the image path
+    // If image was uploaded, store in database
     if (req.file) {
-      projectData.image = `/uploads/${req.file.filename}`;
+      projectData.imageData = req.file.buffer;
+      projectData.image = `/api/projects/${null}/image`; // Will be updated after creation
     }
 
     const project = await Project.create(projectData);
-    res.status(201).json(project);
-  } catch (error) {
-    // If error and file was uploaded, delete it
+    
+    // Update image URL with actual project ID
     if (req.file) {
-      fs.unlinkSync(req.file.path);
+      project.image = `/api/projects/${project._id}/image`;
+      await project.save();
     }
+    
+    const projectResponse = project.toObject();
+    delete projectResponse.imageData;
+    res.status(201).json(projectResponse);
+  } catch (error) {
+    // With memory storage, no file to delete
     next(error);
   }
 });
@@ -97,10 +137,6 @@ router.put('/:id', protect, admin, uploadImage.single('image'), async (req, res,
     const project = await Project.findById(req.params.id);
     
     if (!project) {
-      // If project not found and file was uploaded, delete it
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(404).json({ message: 'Project not found' });
     }
 
@@ -120,17 +156,10 @@ router.put('/:id', protect, admin, uploadImage.single('image'), async (req, res,
       }
     }
     
-    // If new image was uploaded
+    // If new image was uploaded, store in database
     if (req.file) {
-      // Delete old image if it exists and is a local file
-      if (project.image && project.image.startsWith('/uploads/')) {
-        const oldImagePath = path.join(__dirname, '..', project.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      // Set new image path
-      updateData.image = `/uploads/${req.file.filename}`;
+      updateData.imageData = req.file.buffer;
+      updateData.image = `/api/projects/${req.params.id}/image`;
     }
     
     const updatedProject = await Project.findByIdAndUpdate(
@@ -139,12 +168,11 @@ router.put('/:id', protect, admin, uploadImage.single('image'), async (req, res,
       { new: true, runValidators: true }
     );
     
-    res.json(updatedProject);
+    const projectResponse = updatedProject.toObject();
+    delete projectResponse.imageData;
+    res.json(projectResponse);
   } catch (error) {
-    // If error and file was uploaded, delete it
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
+    // With memory storage, no file to delete
     next(error);
   }
 });
@@ -159,14 +187,7 @@ router.delete('/:id', protect, admin, async (req, res, next) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Delete associated image if it exists and is a local file
-    if (project.image && project.image.startsWith('/uploads/')) {
-      const imagePath = path.join(__dirname, '..', project.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
-
+    // Image data is stored in database, will be deleted with project
     await Project.findByIdAndDelete(req.params.id);
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {
