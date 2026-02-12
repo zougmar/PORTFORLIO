@@ -283,7 +283,7 @@ const AdminDashboard = () => {
     { id: 'skills', label: t('admin.skills'), icon: FiCode },
     { id: 'messages', label: t('admin.messages'), icon: FiMail },
     { id: 'cv', label: 'CV Management', icon: FiFileText },
-    { id: 'summary', label: 'Professional Summary', icon: FiUser }
+    { id: 'summary', label: 'Summary', icon: FiUser }
   ];
 
   return (
@@ -668,6 +668,240 @@ const AdminDashboard = () => {
                         )}
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Summary Tab */}
+                {activeTab === 'summary' && (
+                  <div>
+                    <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Summary</h2>
+                    
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await api.put('/settings', {
+                          professionalSummary: settings.professionalSummary,
+                          professionalSummaryFr: settings.professionalSummaryFr,
+                          professionalSummaryAr: settings.professionalSummaryAr,
+                          services: settings.services
+                        });
+                        toast.success('Summary updated successfully!');
+                        fetchData();
+                      } catch (error) {
+                        toast.error('Error updating summary');
+                        console.error('Error:', error);
+                      }
+                    }} className="space-y-6">
+                      {/* Professional Summary - English */}
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2 text-gray-900 dark:text-white">
+                          <span>🇬🇧</span>
+                          <span>Professional Summary (English)</span>
+                        </h3>
+                        <textarea
+                          value={settings.professionalSummary || ''}
+                          onChange={(e) => setSettings({ ...settings, professionalSummary: e.target.value })}
+                          rows="8"
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="Enter your professional summary in English..."
+                        />
+                      </div>
+
+                      {/* Professional Summary - French */}
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2 text-gray-900 dark:text-white">
+                          <span>🇫🇷</span>
+                          <span>Professional Summary (French)</span>
+                        </h3>
+                        <textarea
+                          value={settings.professionalSummaryFr || ''}
+                          onChange={(e) => setSettings({ ...settings, professionalSummaryFr: e.target.value })}
+                          rows="8"
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="Entrez votre résumé professionnel en français..."
+                        />
+                      </div>
+
+                      {/* Professional Summary - Arabic */}
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center space-x-2 text-gray-900 dark:text-white">
+                          <span>🇲🇦</span>
+                          <span>Professional Summary (Arabic)</span>
+                        </h3>
+                        <textarea
+                          value={settings.professionalSummaryAr || ''}
+                          onChange={(e) => setSettings({ ...settings, professionalSummaryAr: e.target.value })}
+                          rows="8"
+                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="أدخل ملخصك المهني بالعربية..."
+                        />
+                      </div>
+
+                      {/* Services Section */}
+                      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">What I Offer (Services)</h3>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newService = {
+                                title: '',
+                                titleFr: '',
+                                titleAr: '',
+                                description: '',
+                                descriptionFr: '',
+                                descriptionAr: '',
+                                icon: '📘'
+                              };
+                              setSettings({
+                                ...settings,
+                                services: [...(settings.services || []), newService]
+                              });
+                            }}
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex items-center space-x-2"
+                          >
+                            <FiPlus className="w-4 h-4" />
+                            <span>Add Service</span>
+                          </button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {(settings.services || []).map((service, index) => (
+                            <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                              <div className="flex justify-between items-start mb-4">
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="text"
+                                    value={service.icon || '📘'}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].icon = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    className="w-12 text-center px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    placeholder="📘"
+                                  />
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">Icon</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updatedServices = (settings.services || []).filter((_, i) => i !== index);
+                                    setSettings({ ...settings, services: updatedServices });
+                                  }}
+                                  className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Title (EN)</label>
+                                  <input
+                                    type="text"
+                                    value={service.title || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].title = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    placeholder="e.g., Mathematics Tutoring"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Title (FR)</label>
+                                  <input
+                                    type="text"
+                                    value={service.titleFr || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].titleFr = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    placeholder="e.g., Tutorat en Mathématiques"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Title (AR)</label>
+                                  <input
+                                    type="text"
+                                    value={service.titleAr || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].titleAr = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    placeholder="e.g., دروس الرياضيات"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description (EN)</label>
+                                  <textarea
+                                    value={service.description || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].description = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    rows="3"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                    placeholder="Service description..."
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description (FR)</label>
+                                  <textarea
+                                    value={service.descriptionFr || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].descriptionFr = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    rows="3"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                    placeholder="Description du service..."
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Description (AR)</label>
+                                  <textarea
+                                    value={service.descriptionAr || ''}
+                                    onChange={(e) => {
+                                      const updatedServices = [...(settings.services || [])];
+                                      updatedServices[index].descriptionAr = e.target.value;
+                                      setSettings({ ...settings, services: updatedServices });
+                                    }}
+                                    rows="3"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                                    placeholder="وصف الخدمة..."
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {(!settings.services || settings.services.length === 0) && (
+                          <p className="text-gray-500 dark:text-gray-400 text-center py-8">No services added yet. Click "Add Service" to get started.</p>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                        >
+                          Save Summary
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 )}
 
