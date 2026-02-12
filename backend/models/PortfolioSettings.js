@@ -24,7 +24,51 @@ const portfolioSettingsSchema = new mongoose.Schema({
   cvFileDataFr: {
     type: Buffer,
     default: null
-  }
+  },
+  // Professional Summary
+  professionalSummary: {
+    type: String,
+    default: ''
+  },
+  professionalSummaryFr: {
+    type: String,
+    default: ''
+  },
+  professionalSummaryAr: {
+    type: String,
+    default: ''
+  },
+  // What I Offer - Services
+  services: [{
+    title: {
+      type: String,
+      default: ''
+    },
+    titleFr: {
+      type: String,
+      default: ''
+    },
+    titleAr: {
+      type: String,
+      default: ''
+    },
+    description: {
+      type: String,
+      default: ''
+    },
+    descriptionFr: {
+      type: String,
+      default: ''
+    },
+    descriptionAr: {
+      type: String,
+      default: ''
+    },
+    icon: {
+      type: String,
+      default: ''
+    }
+  }]
 }, {
   timestamps: true
 });

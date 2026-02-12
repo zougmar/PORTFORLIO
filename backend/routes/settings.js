@@ -22,7 +22,11 @@ router.get('/', async (req, res, next) => {
       cvUrlEn: settings.cvUrlEn || '',
       cvFileNameEn: settings.cvFileNameEn || '',
       cvUrlFr: settings.cvUrlFr || '',
-      cvFileNameFr: settings.cvFileNameFr || ''
+      cvFileNameFr: settings.cvFileNameFr || '',
+      professionalSummary: settings.professionalSummary || '',
+      professionalSummaryFr: settings.professionalSummaryFr || '',
+      professionalSummaryAr: settings.professionalSummaryAr || '',
+      services: settings.services || []
     };
     res.json(settingsResponse);
   } catch (error) {
