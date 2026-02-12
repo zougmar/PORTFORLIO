@@ -679,17 +679,25 @@ const AdminDashboard = () => {
                     <form onSubmit={async (e) => {
                       e.preventDefault();
                       try {
-                        await api.put('/settings', {
-                          professionalSummary: settings.professionalSummary,
-                          professionalSummaryFr: settings.professionalSummaryFr,
-                          professionalSummaryAr: settings.professionalSummaryAr,
-                          services: settings.services
+                        const response = await api.put('/settings', {
+                          professionalSummary: settings.professionalSummary || '',
+                          professionalSummaryFr: settings.professionalSummaryFr || '',
+                          professionalSummaryAr: settings.professionalSummaryAr || '',
+                          services: settings.services || []
                         });
                         toast.success('Summary updated successfully!');
-                        fetchData();
+                        // Update local state with response
+                        setSettings({
+                          ...settings,
+                          professionalSummary: response.data.professionalSummary || '',
+                          professionalSummaryFr: response.data.professionalSummaryFr || '',
+                          professionalSummaryAr: response.data.professionalSummaryAr || '',
+                          services: response.data.services || []
+                        });
                       } catch (error) {
-                        toast.error('Error updating summary');
-                        console.error('Error:', error);
+                        const errorMessage = error.response?.data?.message || error.message || 'Error updating summary';
+                        toast.error(errorMessage);
+                        console.error('Error updating summary:', error);
                       }
                     }} className="space-y-6">
                       {/* Professional Summary - English */}

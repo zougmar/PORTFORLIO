@@ -39,18 +39,63 @@ router.get('/', async (req, res, next) => {
 // @access  Private/Admin
 router.put('/', protect, admin, async (req, res, next) => {
   try {
-    let settings = await PortfolioSettings.findOne();
-    if (!settings) {
-      settings = await PortfolioSettings.create(req.body);
-    } else {
-      settings = await PortfolioSettings.findOneAndUpdate(
-        {},
-        req.body,
-        { new: true, runValidators: true }
-      );
+    let settings = await PortfolioSettings.getSettings();
+    
+    // Prepare update data - only include fields that are being updated
+    const updateData = {};
+    
+    // Update professional summary fields if provided
+    if (req.body.professionalSummary !== undefined) {
+      updateData.professionalSummary = req.body.professionalSummary;
     }
-    res.json(settings);
+    if (req.body.professionalSummaryFr !== undefined) {
+      updateData.professionalSummaryFr = req.body.professionalSummaryFr;
+    }
+    if (req.body.professionalSummaryAr !== undefined) {
+      updateData.professionalSummaryAr = req.body.professionalSummaryAr;
+    }
+    
+    // Update services if provided
+    if (req.body.services !== undefined) {
+      updateData.services = req.body.services;
+    }
+    
+    // Update CV fields if provided (but preserve file data)
+    if (req.body.cvUrlEn !== undefined) {
+      updateData.cvUrlEn = req.body.cvUrlEn;
+    }
+    if (req.body.cvFileNameEn !== undefined) {
+      updateData.cvFileNameEn = req.body.cvFileNameEn;
+    }
+    if (req.body.cvUrlFr !== undefined) {
+      updateData.cvUrlFr = req.body.cvUrlFr;
+    }
+    if (req.body.cvFileNameFr !== undefined) {
+      updateData.cvFileNameFr = req.body.cvFileNameFr;
+    }
+    
+    // Update the settings
+    settings = await PortfolioSettings.findOneAndUpdate(
+      {},
+      updateData,
+      { new: true, runValidators: true }
+    );
+    
+    // Exclude file buffers from response
+    const responseData = {
+      cvUrlEn: settings.cvUrlEn || '',
+      cvFileNameEn: settings.cvFileNameEn || '',
+      cvUrlFr: settings.cvUrlFr || '',
+      cvFileNameFr: settings.cvFileNameFr || '',
+      professionalSummary: settings.professionalSummary || '',
+      professionalSummaryFr: settings.professionalSummaryFr || '',
+      professionalSummaryAr: settings.professionalSummaryAr || '',
+      services: settings.services || []
+    };
+    
+    res.json(responseData);
   } catch (error) {
+    console.error('Error updating settings:', error);
     next(error);
   }
 });
