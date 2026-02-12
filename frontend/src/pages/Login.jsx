@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
+import { FiMail, FiLock, FiLogIn, FiHome, FiArrowLeft } from 'react-icons/fi';
 
 const Login = () => {
   const { t, i18n } = useTranslation();
@@ -47,14 +47,34 @@ const Login = () => {
         <title>Login - Omar Zouglah Portfolio</title>
       </Helmet>
 
-      <div className="min-h-screen flex items-center justify-center pt-20 pb-20 bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
+        {/* Return to Home Link - Top Right */}
+        <Link
+          to="/"
+          className="absolute top-6 right-6 flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-md hover:shadow-lg"
+        >
+          <FiArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Return to Home</span>
+        </Link>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl">
+            {/* Logo inside form - clickable to go to homepage */}
             <div className="text-center mb-8">
+              <Link
+                to="/"
+                className="inline-block mb-4 hover:opacity-80 transition-opacity"
+              >
+                <img 
+                  src="/images/logo.jpeg" 
+                  alt="Omar Zouglah Logo" 
+                  className="h-16 w-16 mx-auto rounded-lg object-cover shadow-md hover:shadow-lg transition-shadow"
+                />
+              </Link>
               <h1 className="text-3xl font-bold mb-2">{t('auth.login')}</h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Sign in to access the admin dashboard

@@ -20,10 +20,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isLoginRoute = location.pathname === '/login';
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && !isLoginRoute && <Navbar />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -45,8 +46,8 @@ function AppContent() {
           />
         </Routes>
       </main>
-      {!isAdminRoute && <Footer />}
-      {!isAdminRoute && <WhatsAppFloat />}
+      {!isAdminRoute && !isLoginRoute && <Footer />}
+      {!isAdminRoute && !isLoginRoute && <WhatsAppFloat />}
       <Toaster
         position="top-right"
         toastOptions={{
