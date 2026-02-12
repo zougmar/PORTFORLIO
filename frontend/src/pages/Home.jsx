@@ -284,7 +284,7 @@ const Home = () => {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="space-y-6"
+              className="space-y-6 order-2 lg:order-1"
             >
               <motion.p
                 initial={{ opacity: 0 }}
@@ -366,7 +366,7 @@ const Home = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative"
+              className="relative order-1 lg:order-2"
             >
               <div className="relative flex items-center justify-center">
                 <div className="relative">
