@@ -33,14 +33,14 @@ const Home = () => {
     fetchProjects();
   }, [i18n.language]);
 
-  // Fetch user profile data from backend
+  // Fetch user profile data from backend (public endpoint for portfolio)
   const fetchProfileData = async () => {
     try {
-      const response = await api.get('/users/profile/me');
+      const response = await api.get('/users/profile/public');
       setProfileData(response.data);
     } catch (error) {
       console.error('Error fetching profile data:', error);
-      // If not authenticated or profile not found, use default values
+      // If profile not found, use default values
     }
   };
 
