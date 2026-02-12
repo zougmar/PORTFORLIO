@@ -12,7 +12,8 @@ import Projects from './pages/Projects';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import Register from './pages/Register';
+// Registration is disabled for security - only existing users can access admin panel
+// import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -32,7 +33,8 @@ function AppContent() {
           <Route path="/experience" element={<Experience />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Registration is disabled for security - only existing users can access admin panel */}
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route
             path="/admin"
             element={

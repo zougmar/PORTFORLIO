@@ -16,6 +16,9 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
+// REGISTRATION IS DISABLED FOR SECURITY - Only existing users can access admin panel
+// To re-enable registration, uncomment the code below
+/*
 router.post('/register', [
   body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -54,6 +57,7 @@ router.post('/register', [
     next(error);
   }
 });
+*/
 
 // @route   POST /api/auth/login
 // @desc    Login user

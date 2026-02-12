@@ -110,7 +110,8 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-6 text-center">
+            {/* Registration is disabled for security - only existing users can access admin panel */}
+            {/* <div className="mt-6 text-center">
               <p className="text-gray-600 dark:text-gray-400">
                 {t('auth.dontHaveAccount')}{' '}
                 <Link
@@ -120,7 +121,7 @@ const Login = () => {
                   {t('auth.register')}
                 </Link>
               </p>
-            </div>
+            </div> */}
           </div>
         </motion.div>
       </div>
