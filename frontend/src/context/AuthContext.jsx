@@ -81,12 +81,37 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully');
   };
 
+  const fetchUserProfile = async () => {
+    try {
+      const response = await api.get('/users/profile/me');
+      setUser(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      throw error;
+    }
+  };
+
+  const updateUserProfile = async (formData) => {
+    try {
+      const response = await api.put('/users/profile/me', formData);
+      setUser(response.data.user);
+      return { success: true, user: response.data.user };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Profile update failed';
+      toast.error(message);
+      return { success: false, error: message };
+    }
+  };
+
   const value = {
     user,
     loading,
     login,
     register,
     logout,
+    fetchUserProfile,
+    updateUserProfile,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin'
   };

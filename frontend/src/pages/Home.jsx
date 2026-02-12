@@ -4,10 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { FiDownload, FiMail, FiArrowRight, FiX, FiMapPin, FiPhone, FiUser, FiGithub, FiExternalLink, FiStar, FiBriefcase, FiCalendar, FiSend } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [profileData, setProfileData] = useState(null);
   const [cvSettings, setCvSettings] = useState({ cvUrlEn: '', cvUrlFr: '' });
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [skills, setSkills] = useState([]);
@@ -24,10 +27,22 @@ const Home = () => {
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    fetchProfileData();
     fetchCVSettings();
     fetchSkills();
     fetchProjects();
   }, [i18n.language]);
+
+  // Fetch user profile data from backend
+  const fetchProfileData = async () => {
+    try {
+      const response = await api.get('/users/profile/me');
+      setProfileData(response.data);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+      // If not authenticated or profile not found, use default values
+    }
+  };
 
   // Helper function to get full image URL
   const getImageUrl = (imagePath) => {
@@ -146,11 +161,11 @@ const Home = () => {
   };
 
   const personalInfo = [
-    { icon: FiUser, label: t('about.fullName'), value: 'Omar Zouglah' },
-    { icon: FiUser, label: t('about.title'), value: t('hero.title') },
-    { icon: FiMapPin, label: t('about.location'), value: t('hero.location') },
-    { icon: FiMail, label: t('about.email'), value: 'o.zouglah03@gmail.com' },
-    { icon: FiPhone, label: t('about.phone'), value: '+212 707625535' }
+    { icon: FiUser, label: t('about.fullName'), value: profileData?.username || 'Omar Zouglah' },
+    { icon: FiUser, label: t('about.title'), value: profileData?.jobTitle || t('hero.title') },
+    { icon: FiMapPin, label: t('about.location'), value: profileData?.location || t('hero.location') },
+    { icon: FiMail, label: t('about.email'), value: profileData?.email || 'o.zouglah03@gmail.com' },
+    { icon: FiPhone, label: t('about.phone'), value: profileData?.phone || '+212 707625535' }
   ];
 
   const languages = ['Arabic (Fluent)', 'Amazigh (Fluent)', 'English (Upper-Intermediate)', 'French (Intermediate)'];
@@ -372,10 +387,10 @@ const Home = () => {
                 <div className="relative">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 opacity-20 blur-2xl animate-pulse"></div>
                   <div className="absolute inset-0 rounded-full border-4 border-primary-200 dark:border-primary-800"></div>
-                  <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
+                <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
                     <img 
-                      src="/images/my_image.jpeg" 
-                      alt="Omar Zouglah" 
+                      src={profileData?.image || "/images/my_image.jpeg"} 
+                      alt="Profile" 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -514,8 +529,8 @@ const Home = () => {
                 <div className="absolute inset-0 rounded-full border-4 border-primary-200 dark:border-primary-800"></div>
                 <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
                   <img 
-                    src="/images/my_image.jpeg" 
-                    alt="Omar Zouglah" 
+                    src={profileData?.image ? getImageUrl(profileData.image) : "/images/my_image.jpeg"} 
+                    alt={profileData?.username || "Omar Zouglah"} 
                     className="w-full h-full object-cover"
                   />
                 </div>

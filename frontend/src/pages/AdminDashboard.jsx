@@ -23,15 +23,17 @@ import {
   FiCircle
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
+import ProfileEditModal from '../components/ProfileEditModal';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('projects');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -50,14 +52,25 @@ const AdminDashboard = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
+  const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    fetchProfileData();
   }, [i18n.language]);
 
   useEffect(() => {
     fetchData();
   }, [activeTab]);
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await api.get('/users/profile/me');
+      setProfileData(response.data);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -201,7 +214,6 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
-    toast.success('Logged out successfully');
   };
 
   const handleViewMessage = async (message) => {
@@ -288,11 +300,19 @@ const AdminDashboard = () => {
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <img 
-                    src="/images/logo.jpeg" 
-                    alt="Logo" 
-                    className="w-10 h-10 rounded-lg object-cover"
-                  />
+                  {profileData?.image ? (
+                    <img 
+                      src={getImageUrl(profileData.image)} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-lg object-cover border-2 border-primary-200 dark:border-primary-800"
+                    />
+                  ) : (
+                    <img 
+                      src="/images/logo.jpeg" 
+                      alt="Logo" 
+                      className="w-8 h-8 rounded-lg object-cover"
+                    />
+                  )}
                   <div>
                     <h1 className="text-xl font-bold text-gray-900 dark:text-white">Admin Panel</h1>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Dashboard</p>
@@ -336,6 +356,7 @@ const AdminDashboard = () => {
 
             {/* Footer Actions */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+              {/* Profile Section */}
               <button
                 onClick={() => {
                   navigate('/');
@@ -345,6 +366,16 @@ const AdminDashboard = () => {
               >
                 <FiHome className="w-5 h-5" />
                 <span className="font-medium">Back to Site</span>
+              </button>
+              <button
+                onClick={() => {
+                  setShowProfileModal(true);
+                  setSidebarOpen(false);
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <FiUser className="w-5 h-5" />
+                <span className="font-medium">Profile</span>
               </button>
               <button
                 onClick={handleLogout}
@@ -1140,6 +1171,15 @@ const AdminDashboard = () => {
             </motion.div>
           </div>
         )}
+
+        {/* Profile Edit Modal */}
+        <ProfileEditModal
+          isOpen={showProfileModal}
+          onClose={async () => {
+            setShowProfileModal(false);
+            await fetchProfileData();
+          }}
+        />
       </div>
     </>
   );

@@ -27,6 +27,32 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'user'],
     default: 'user'
+  },
+  // Profile fields
+  phone: {
+    type: String,
+    trim: true
+  },
+  bio: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  image: {
+    type: String,
+    default: null
+  },
+  imageData: {
+    type: Buffer,
+    default: null
+  },
+  location: {
+    type: String,
+    trim: true
+  },
+  jobTitle: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true
