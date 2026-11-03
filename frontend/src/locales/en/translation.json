@@ -147,7 +147,21 @@
     "loginSuccess": "Logged in successfully!",
     "loginError": "Invalid credentials",
     "registerSuccess": "Account created successfully!",
-    "registerError": "Registration failed"
+    "registerError": "Registration failed",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordSubtitle": "Enter the email for your admin account. If it matches, we will send a reset link that expires in 1 hour.",
+    "sendResetLink": "Send reset link",
+    "resetEmailSent": "If an account with that email exists, a password reset link has been sent. Check your inbox.",
+    "backToLogin": "Back to login",
+    "resetPasswordTitle": "Reset password",
+    "resetPasswordSubtitle": "Choose a new password for your admin account. It must be at least 6 characters.",
+    "newPassword": "New password",
+    "resetPasswordButton": "Update password",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "resetLinkInvalid": "This reset link is invalid or has expired.",
+    "requestNewLink": "Request a new link"
   },
   "common": {
     "loading": "Loading...",

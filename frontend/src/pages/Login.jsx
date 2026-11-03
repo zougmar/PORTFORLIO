@@ -96,6 +96,7 @@ const Login = () => {
                     onChange={handleChange}
                     required
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    autoComplete="email"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -115,9 +116,19 @@ const Login = () => {
                     onChange={handleChange}
                     required
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    autoComplete="current-password"
                     placeholder="••••••••"
                   />
                 </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                >
+                  {t('auth.forgotPassword')}
+                </Link>
               </div>
 
               <button

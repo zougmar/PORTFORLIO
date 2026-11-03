@@ -147,7 +147,21 @@
     "loginSuccess": "تم تسجيل الدخول بنجاح!",
     "loginError": "بيانات اعتماد غير صحيحة",
     "registerSuccess": "تم إنشاء الحساب بنجاح!",
-    "registerError": "فشل التسجيل"
+    "registerError": "فشل التسجيل",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "forgotPasswordTitle": "نسيت كلمة المرور",
+    "forgotPasswordSubtitle": "أدخل البريد الإلكتروني لحساب المسؤول. إذا كان مطابقاً، سنرسل رابطاً تنتهي صلاحيته خلال ساعة.",
+    "sendResetLink": "إرسال الرابط",
+    "resetEmailSent": "إذا كان هناك حساب لهذا البريد، فقد أُرسل رابط إعادة التعيين. تحقق من صندوق الوارد.",
+    "backToLogin": "العودة لتسجيل الدخول",
+    "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+    "resetPasswordSubtitle": "اختر كلمة مرور جديدة من 6 أحرف على الأقل لحساب المسؤول.",
+    "newPassword": "كلمة المرور الجديدة",
+    "resetPasswordButton": "تحديث كلمة المرور",
+    "passwordTooShort": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "resetLinkInvalid": "رابط إعادة التعيين غير صالح أو منتهي الصلاحية.",
+    "requestNewLink": "طلب رابط جديد"
   },
   "common": {
     "loading": "جاري التحميل...",

@@ -147,7 +147,21 @@
     "loginSuccess": "Connecté avec succès !",
     "loginError": "Identifiants invalides",
     "registerSuccess": "Compte créé avec succès !",
-    "registerError": "Échec de l'inscription"
+    "registerError": "Échec de l'inscription",
+    "forgotPassword": "Mot de passe oublié ?",
+    "forgotPasswordTitle": "Mot de passe oublié",
+    "forgotPasswordSubtitle": "Saisissez l'e-mail du compte administrateur. S'il correspond, nous enverrons un lien valable 1 heure.",
+    "sendResetLink": "Envoyer le lien",
+    "resetEmailSent": "Si un compte existe pour cet e-mail, un lien de réinitialisation a été envoyé. Vérifiez votre boîte de réception.",
+    "backToLogin": "Retour à la connexion",
+    "resetPasswordTitle": "Réinitialiser le mot de passe",
+    "resetPasswordSubtitle": "Choisissez un nouveau mot de passe d'au moins 6 caractères pour le compte administrateur.",
+    "newPassword": "Nouveau mot de passe",
+    "resetPasswordButton": "Mettre à jour le mot de passe",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "resetLinkInvalid": "Ce lien de réinitialisation est invalide ou a expiré.",
+    "requestNewLink": "Demander un nouveau lien"
   },
   "common": {
     "loading": "Chargement...",

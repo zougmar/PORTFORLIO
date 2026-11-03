@@ -74,6 +74,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const requestPasswordReset = async (email) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      toast.success(response.data.message);
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Could not send the reset email';
+      toast.error(message);
+      return { success: false, error: message };
+    }
+  };
+
+  const resetPassword = async (token, password) => {
+    try {
+      const response = await api.post('/auth/reset-password', { token, password });
+      toast.success(response.data.message);
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Could not reset the password';
+      toast.error(message);
+      return { success: false, error: message };
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -109,6 +133,8 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    requestPasswordReset,
+    resetPassword,
     logout,
     fetchUserProfile,
     updateUserProfile,

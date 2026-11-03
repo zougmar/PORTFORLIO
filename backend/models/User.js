@@ -53,6 +53,19 @@ const userSchema = new mongoose.Schema({
   jobTitle: {
     type: String,
     trim: true
+  },
+  resetPasswordToken: {
+    type: String,
+    select: false
+  },
+  resetPasswordExpire: {
+    type: Date,
+    select: false
+  },
+  passwordVersion: {
+    type: Number,
+    default: 0,
+    select: false
   }
 }, {
   timestamps: true
@@ -61,6 +74,9 @@ const userSchema = new mongoose.Schema({
 // Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
+  if (!this.isNew) {
+    this.passwordVersion = (this.passwordVersion || 0) + 1;
+  }
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });

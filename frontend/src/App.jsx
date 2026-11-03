@@ -12,6 +12,8 @@ import Projects from './pages/Projects';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 // Registration is disabled for security - only existing users can access admin panel
 // import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
@@ -20,11 +22,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isLoginRoute = location.pathname === '/login';
+  const isAuthRoute = ['/login', '/forgot-password', '/reset-password'].includes(location.pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!isAdminRoute && !isLoginRoute && <Navbar />}
+      {!isAdminRoute && !isAuthRoute && <Navbar />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,6 +36,8 @@ function AppContent() {
           <Route path="/experience" element={<Experience />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           {/* Registration is disabled for security - only existing users can access admin panel */}
           {/* <Route path="/register" element={<Register />} /> */}
           <Route
@@ -46,8 +50,8 @@ function AppContent() {
           />
         </Routes>
       </main>
-      {!isAdminRoute && !isLoginRoute && <Footer />}
-      {!isAdminRoute && !isLoginRoute && <WhatsAppFloat />}
+      {!isAdminRoute && !isAuthRoute && <Footer />}
+      {!isAdminRoute && !isAuthRoute && <WhatsAppFloat />}
       <Toaster
         position="top-right"
         toastOptions={{
