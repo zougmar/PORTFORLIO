@@ -81,7 +81,7 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', protect, admin, uploadImage.single('image'), [
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('description').trim().notEmpty().withMessage('Description is required'),
-  body('category').isIn(['web', 'mobile', 'fullstack', 'other']).withMessage('Invalid category')
+  body('category').optional({ values: 'falsy' }).isIn(['web', 'mobile', 'fullstack', 'other']).withMessage('Invalid category')
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -91,6 +91,9 @@ router.post('/', protect, admin, uploadImage.single('image'), [
     }
 
     const projectData = { ...req.body };
+    if (!projectData.category) {
+      projectData.category = 'web';
+    }
     
     // Handle technologies array from FormData
     if (req.body.technologies) {

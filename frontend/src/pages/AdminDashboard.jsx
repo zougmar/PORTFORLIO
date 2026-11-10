@@ -119,6 +119,12 @@ const AdminDashboard = () => {
     if (item) {
       setFormData(item);
       setImagePreview(item.image || null);
+    } else if (type === 'projects') {
+      setFormData({ category: 'web', featured: false, technologies: [] });
+      setImagePreview(null);
+    } else if (type === 'skills') {
+      setFormData({ category: 'language', proficiency: 50 });
+      setImagePreview(null);
     } else {
       setFormData({});
       setImagePreview(null);
@@ -174,17 +180,9 @@ const AdminDashboard = () => {
 
         // Use api utility for file uploads (axios handles FormData)
         if (editingItem) {
-          await api.put(`/projects/${editingItem._id}`, submitData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
+          await api.put(`/projects/${editingItem._id}`, submitData);
         } else {
-          await api.post('/projects', submitData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
+          await api.post('/projects', submitData);
         }
 
         toast.success(editingItem ? 'Project updated successfully' : 'Project created successfully');
@@ -202,7 +200,8 @@ const AdminDashboard = () => {
       closeModal();
       fetchData();
     } catch (error) {
-      toast.error(error.message || 'Error saving item');
+      const validationMessage = error.response?.data?.errors?.[0]?.msg;
+      toast.error(validationMessage || error.response?.data?.message || 'Error saving item');
       console.error('Error:', error);
     }
   };
