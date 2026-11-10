@@ -616,10 +616,15 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="mx-auto mb-14 max-w-2xl text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">{t('projects.title')}</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">{t('projects.subtitle')}</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-primary-600 dark:text-primary-300">
+              {t('projects.subtitle')}
+            </p>
+            <h2 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white md:text-5xl">
+              {t('projects.title')}
+            </h2>
+            <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-primary-500 to-transparent"></div>
           </motion.div>
 
           {loadingProjects ? (
