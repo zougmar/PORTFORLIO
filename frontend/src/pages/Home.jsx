@@ -43,12 +43,12 @@ const ProjectCard = ({
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute z-30 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-opacity duration-300"
+        className="pointer-events-none absolute z-30 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-opacity duration-300"
         style={{
           left: glow.x,
           top: glow.y,
-          opacity: glow.on ? 1 : 0,
-          background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(125,211,252,0.55) 42%, rgba(14,165,233,0.05) 70%, transparent 78%)',
+          opacity: glow.on ? 0.4 : 0,
+          background: 'radial-gradient(circle, rgba(255,255,255,0.45) 0%, rgba(186,230,253,0.22) 46%, transparent 72%)',
         }}
       />
 
@@ -289,7 +289,7 @@ const Home = () => {
 
   const personalInfo = [
     { icon: FiUser, label: t('about.fullName'), value: profileData?.username || 'Omar Zouglah' },
-    { icon: FiUser, label: t('about.title'), value: profileData?.jobTitle || t('hero.title') },
+    { icon: FiUser, label: t('about.jobTitle'), value: profileData?.jobTitle || t('hero.title') },
     { icon: FiMapPin, label: t('about.location'), value: profileData?.location || t('hero.location') },
     { icon: FiMail, label: t('about.email'), value: profileData?.email || 'o.zouglah03@gmail.com' },
     { icon: FiPhone, label: t('about.phone'), value: profileData?.phone || '+212 707625535' }
@@ -676,106 +676,85 @@ const Home = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="section-padding bg-gray-50 dark:bg-gray-800">
+      <section id="about" className="section-padding bg-gray-50 dark:bg-gray-950">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="mx-auto mb-14 max-w-2xl text-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">{t('about.title')}</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">{t('about.subtitle')}</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-primary-600 dark:text-primary-300">
+              {t('about.subtitle')}
+            </p>
+            <h2 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-white md:text-5xl">
+              {t('about.title')}
+            </h2>
+            <div className="mx-auto mt-5 h-px w-20 bg-gradient-to-r from-transparent via-primary-500 to-transparent"></div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[300px_1fr]">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:order-2 flex items-center justify-center"
+              className="mx-auto w-full max-w-xs lg:mx-0"
             >
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 opacity-20 blur-xl"></div>
-                <div className="absolute inset-0 rounded-full border-4 border-primary-200 dark:border-primary-800"></div>
-                <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
-                  <img 
-                    src={profileData?.image ? getImageUrl(profileData.image) : "/images/my_image.jpeg"} 
-                    alt={profileData?.username || "Omar Zouglah"} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="absolute bottom-0 right-0 w-16 h-16 bg-primary-600 dark:bg-primary-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-800">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
+                <img
+                  src={profileData?.image ? getImageUrl(profileData.image) : "/images/my_image.jpeg"}
+                  alt={profileData?.username || "Omar Zouglah"}
+                  className="aspect-[4/5] w-full object-cover object-top"
+                />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {languages.map((lang) => (
+                  <span
+                    key={lang}
+                    className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 dark:border-white/10 dark:bg-gray-900 dark:text-gray-300"
+                  >
+                    {lang}
+                  </span>
+                ))}
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="space-y-8 lg:order-1"
             >
-              <div>
-                <h3 className="text-3xl font-bold mb-6">{t('about.personalInfo')}</h3>
-                <div className="space-y-4">
-                  {personalInfo.map((info, index) => (
-                    <div key={index} className="flex items-start space-x-4">
-                      <info.icon className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1" />
-                      <div>
-                        <p className="font-semibold text-gray-700 dark:text-gray-300">{info.label}</p>
-                        <p className="text-gray-600 dark:text-gray-400">{info.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <p className="max-w-2xl text-lg leading-8 text-gray-600 dark:text-gray-300">
+                {t('about.description')}
+              </p>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-4">{t('about.languages')}</h3>
-                <ul className="space-y-2">
-                  {languages.map((lang, index) => (
-                    <li key={index} className="text-gray-600 dark:text-gray-400 flex items-center">
-                      <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                      {lang}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-5 border-t border-gray-200 pt-8 dark:border-white/10 sm:grid-cols-2">
+                {personalInfo.map((info) => (
+                  <div key={info.label}>
+                    <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">{info.label}</dt>
+                    <dd className="mt-1 text-base text-gray-900 dark:text-white">{info.value}</dd>
+                  </div>
+                ))}
+              </dl>
 
-              <div>
-                <h3 className="text-3xl font-bold mb-6">Bio</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
-                  {t('about.description')}
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-3xl font-bold mb-6">{t('about.education')}</h3>
-                <div className="space-y-6">
-                  {education.map((edu, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md border-l-4 border-primary-600"
-                    >
-                      <h4 className="text-xl font-semibold mb-2">{edu.title}</h4>
-                      <p className="text-primary-600 dark:text-primary-400 mb-2">{edu.period}</p>
+              <h3 className="mb-4 mt-12 text-xs font-semibold uppercase tracking-[0.22em] text-primary-600 dark:text-primary-300">
+                {t('about.education')}
+              </h3>
+              <div className="divide-y divide-gray-200 dark:divide-white/10">
+                {education.map((edu, index) => (
+                  <div key={index} className="grid gap-1 py-5 sm:grid-cols-[160px_1fr] sm:gap-6">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{edu.period}</p>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{edu.title}</h4>
                       {edu.institution && (
-                        <p className="text-gray-600 dark:text-gray-400 mb-2">{edu.institution}</p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{edu.institution}</p>
                       )}
                       {edu.description && (
-                        <p className="text-gray-600 dark:text-gray-400">{edu.description}</p>
+                        <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">{edu.description}</p>
                       )}
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </div>

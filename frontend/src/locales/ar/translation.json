@@ -26,7 +26,7 @@
     "description": "أنا مطور Full Stack شغوف بخبرة في MERN stack (MongoDB, Express.js, React.js, Node.js). أحب بناء تطبيقات ويب حديثة وقابلة للتطوير وحل المشاكل المعقدة من خلال الكود.",
     "personalInfo": "المعلومات الشخصية",
     "fullName": "الاسم الكامل",
-    "title": "المسمى الوظيفي",
+    "jobTitle": "المسمى الوظيفي",
     "location": "الموقع",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
