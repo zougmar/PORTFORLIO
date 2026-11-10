@@ -532,77 +532,101 @@ const Home = () => {
 
       {/* Professional Summary Section */}
       {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr || (portfolioSettings.services && portfolioSettings.services.length > 0)) && (
-        <section id="professional-summary" className="section-padding bg-white dark:bg-gray-900">
+        <section id="professional-summary" className="section-padding bg-[#efe8dc] dark:bg-[#14110e]">
           <div className="container-custom">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="relative mx-auto max-w-3xl"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Professional Summary</h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">What I Offer</p>
+              <div className="absolute bottom-3 left-10 right-0 top-3 translate-x-3 rounded-r-sm bg-[#cfc4b2] shadow-md dark:bg-[#2a241c]"></div>
+              <div className="absolute bottom-1.5 left-8 right-0 top-1.5 translate-x-1.5 rounded-r-sm bg-[#f7f1e7] dark:bg-[#3a3228]"></div>
+
+              <div className="relative flex overflow-hidden rounded-r-sm shadow-[0_28px_50px_-18px_rgba(28,22,14,0.55)]">
+                <div className="flex w-12 shrink-0 items-center justify-center bg-[#142033] sm:w-16">
+                  <span
+                    className="text-[11px] font-medium uppercase tracking-[0.35em] text-amber-100/80"
+                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                  >
+                    {profileData?.username || 'Omar Zouglah'}
+                  </span>
+                </div>
+
+                <div className="relative flex-1 bg-[#1b2c42] px-6 py-10 text-[#f6edd9] sm:px-12 sm:py-14">
+                  <div className="pointer-events-none absolute inset-3 border border-amber-100/25 sm:inset-5"></div>
+                  <div className="relative">
+                    <p className="text-center text-[11px] font-medium uppercase tracking-[0.42em] text-amber-100/70">
+                      What I Offer
+                    </p>
+                    <h2 className={`mt-4 text-center text-4xl leading-tight sm:text-5xl ${i18n.language === 'ar' ? 'font-arabic' : 'font-serif'}`}>
+                      Professional Summary
+                    </h2>
+                    <div className="mx-auto mt-5 h-px w-24 bg-amber-100/50"></div>
+                    <p className="mt-3 text-center text-sm italic text-amber-100/75">
+                      {profileData?.jobTitle || 'Full Stack Developer'}
+                    </p>
+
+                    {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr) && (
+                      <p className={`mt-8 whitespace-pre-line text-lg leading-8 text-[#f8f1e3]/95 ${i18n.language === 'ar' ? 'font-arabic' : 'font-serif first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-5xl first-letter:leading-none first-letter:text-amber-100'}`}>
+                        {i18n.language === 'fr' && portfolioSettings.professionalSummaryFr
+                          ? portfolioSettings.professionalSummaryFr
+                          : i18n.language === 'ar' && portfolioSettings.professionalSummaryAr
+                          ? portfolioSettings.professionalSummaryAr
+                          : portfolioSettings.professionalSummary}
+                      </p>
+                    )}
+
+                    <p className={`mt-10 text-center text-sm tracking-[0.22em] text-amber-100/80 ${i18n.language === 'ar' ? 'font-arabic' : 'font-serif'}`}>
+                      {profileData?.username || 'Omar Zouglah'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
-            {/* Professional Summary Text */}
-            {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr) && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="max-w-4xl mx-auto mb-12"
-              >
-                <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-8 shadow-lg">
-                  <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                    {i18n.language === 'fr' && portfolioSettings.professionalSummaryFr
-                      ? portfolioSettings.professionalSummaryFr
-                      : i18n.language === 'ar' && portfolioSettings.professionalSummaryAr
-                      ? portfolioSettings.professionalSummaryAr
-                      : portfolioSettings.professionalSummary}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Services Grid */}
             {portfolioSettings.services && portfolioSettings.services.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {portfolioSettings.services.map((service, index) => {
-                  const getServiceTitle = () => {
-                    if (i18n.language === 'fr' && service.titleFr) return service.titleFr;
-                    if (i18n.language === 'ar' && service.titleAr) return service.titleAr;
-                    return service.title;
-                  };
+              <div className="mx-auto mt-12 max-w-3xl">
+                <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.28em] text-[#6d5b45] dark:text-amber-100/70">
+                  Chapters
+                </p>
+                <div className="space-y-4">
+                  {portfolioSettings.services.map((service, index) => {
+                    const serviceTitle = i18n.language === 'fr' && service.titleFr
+                      ? service.titleFr
+                      : i18n.language === 'ar' && service.titleAr
+                      ? service.titleAr
+                      : service.title;
+                    const serviceDescription = i18n.language === 'fr' && service.descriptionFr
+                      ? service.descriptionFr
+                      : i18n.language === 'ar' && service.descriptionAr
+                      ? service.descriptionAr
+                      : service.description;
 
-                  const getServiceDescription = () => {
-                    if (i18n.language === 'fr' && service.descriptionFr) return service.descriptionFr;
-                    if (i18n.language === 'ar' && service.descriptionAr) return service.descriptionAr;
-                    return service.description;
-                  };
-
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow border-l-4 border-primary-600"
-                    >
-                      <div className="flex items-start space-x-4">
-                        <div className="text-4xl flex-shrink-0">{service.icon || '📘'}</div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">
-                            {getServiceTitle()}
+                    return (
+                      <motion.article
+                        key={index}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.06 }}
+                        className="flex gap-4 rounded-sm border border-[#e4d8c4] bg-[#fbf7f0] p-5 dark:border-white/10 dark:bg-[#1c1916]"
+                      >
+                        <span className={`w-10 shrink-0 text-lg text-[#8a6a3b] dark:text-amber-200/80 ${i18n.language === 'ar' ? 'font-arabic' : 'font-serif'}`}>
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <div>
+                          <h3 className="text-lg font-semibold text-[#241c14] dark:text-amber-50">
+                            {service.icon ? `${service.icon} ` : ''}{serviceTitle}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                            {getServiceDescription()}
+                          <p className="mt-1 leading-7 text-[#5c5146] dark:text-amber-50/70">
+                            {serviceDescription}
                           </p>
                         </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                      </motion.article>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
