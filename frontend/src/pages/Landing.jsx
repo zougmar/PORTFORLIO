@@ -96,14 +96,14 @@ const Landing = () => {
                   <span>{t('hero.downloadCV')}</span>
                 </button>
                 <button
-                  onClick={() => navigate('/home#contact')}
+                  onClick={() => navigate('/#contact')}
                   className="flex items-center space-x-2 px-6 py-3 bg-white text-primary-600 border-2 border-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
                 >
                   <FiMail className="w-5 h-5" />
                   <span>{t('hero.contactMe')}</span>
                 </button>
                 <button
-                  onClick={() => navigate('/home#projects')}
+                  onClick={() => navigate('/#projects')}
                   className="flex items-center space-x-2 px-6 py-3 text-white hover:text-primary-200 transition-colors"
                 >
                   <span>{t('hero.viewWork')}</span>

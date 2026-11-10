@@ -59,8 +59,8 @@ const Navbar = () => {
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
   const scrollToSection = (sectionId) => {
-    if (location.pathname !== '/home') {
-      window.location.href = `/home#${sectionId}`;
+    if (location.pathname !== '/') {
+      window.location.href = `/#${sectionId}`;
     } else {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -73,6 +73,7 @@ const Navbar = () => {
   const onLanding = location.pathname === '/' && !scrolled;
 
   const navLinks = [
+    { id: 'home', label: t('nav.home'), action: () => scrollToSection('home') },
     { id: 'about', label: t('nav.about'), action: () => scrollToSection('about') },
     { id: 'professional-summary', label: 'Services', action: () => scrollToSection('professional-summary') },
     { id: 'skills', label: t('nav.skills'), action: () => scrollToSection('skills') },
@@ -95,10 +96,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           <button 
             onClick={() => {
-              if (location.pathname === '/home') {
+              if (location.pathname === '/') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                window.location.href = '/home';
+                window.location.href = '/';
               }
             }}
             className="flex items-center cursor-pointer"
@@ -117,7 +118,7 @@ const Navbar = () => {
                 key={link.id}
                 onClick={link.action}
                 className={`text-sm font-medium transition-colors ${
-                  location.pathname === '/home' && window.location.hash === `#${link.id}`
+                  location.pathname === '/' && window.location.hash === `#${link.id}`
                     ? 'text-primary-600 dark:text-primary-400'
                     : onLanding
                     ? 'text-white hover:text-primary-200'
@@ -237,7 +238,7 @@ const Navbar = () => {
                   key={link.id}
                   onClick={link.action}
                   className={`block w-full text-left py-2 text-sm font-medium ${
-                    location.pathname === '/home' && window.location.hash === `#${link.id}`
+                    location.pathname === '/' && window.location.hash === `#${link.id}`
                       ? 'text-primary-600 dark:text-primary-400'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}

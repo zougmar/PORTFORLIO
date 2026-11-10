@@ -557,7 +557,119 @@ const Home = () => {
         <meta name="description" content={t('hero.description')} />
       </Helmet>
 
-      <div className="pt-20">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <img
+          src="/images/hero-tech-background.jpg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-right"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-gray-950/80 via-gray-950/50 to-gray-950/10"></div>
+        <div className="container-custom section-padding relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-6 order-2 lg:order-1"
+            >
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-primary-300 font-semibold"
+              >
+                {t('hero.greeting')}
+              </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-5xl md:text-6xl lg:text-7xl font-bold"
+              >
+                <span className="gradient-text">{t('hero.name')}</span>
+              </motion.h1>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-2xl md:text-3xl text-white"
+              >
+                {t('hero.title')}
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-lg text-gray-200 flex items-center space-x-2"
+              >
+                <span>📍</span>
+                <span>{t('hero.location')}</span>
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="text-gray-300 max-w-xl"
+              >
+                {t('hero.description')}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="flex flex-wrap gap-4"
+              >
+                <button
+                  onClick={handleDownloadCV}
+                  className="flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-lg"
+                >
+                  <FiDownload className="w-5 h-5" />
+                  <span>{t('hero.downloadCV')}</span>
+                </button>
+                <button
+                  onClick={() => scrollToSection('contact')}
+                  className="flex items-center space-x-2 px-6 py-3 bg-white text-primary-600 border-2 border-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+                >
+                  <FiMail className="w-5 h-5" />
+                  <span>{t('hero.contactMe')}</span>
+                </button>
+                <button
+                  onClick={() => scrollToSection('projects')}
+                  className="flex items-center space-x-2 px-6 py-3 text-white hover:text-primary-200 transition-colors"
+                >
+                  <span>{t('hero.viewWork')}</span>
+                  <FiArrowRight className="w-5 h-5" />
+                </button>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="relative order-1 lg:order-2"
+            >
+              <div className="relative flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600 opacity-20 blur-2xl animate-pulse"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-primary-200 dark:border-primary-800"></div>
+                  <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
+                    <img
+                      src={profileData?.image || "/images/my_image.jpeg"}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary-400 rounded-full opacity-20 blur-xl"></div>
+                  <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary-600 rounded-full opacity-20 blur-xl"></div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Professional Summary Section */}
       {(portfolioSettings.professionalSummary || portfolioSettings.professionalSummaryFr || portfolioSettings.professionalSummaryAr || (portfolioSettings.services && portfolioSettings.services.length > 0)) && (
         <section id="professional-summary" className="section-padding bg-[#efe8dc] dark:bg-[#14110e]">
@@ -1144,7 +1256,6 @@ const Home = () => {
           </div>
         )}
       </AnimatePresence>
-      </div>
     </>
   );
 };
