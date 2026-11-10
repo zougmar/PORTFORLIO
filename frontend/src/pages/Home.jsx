@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -6,6 +6,121 @@ import { FiDownload, FiMail, FiArrowRight, FiX, FiMapPin, FiPhone, FiUser, FiGit
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
+
+const ProjectCard = ({
+  project,
+  index,
+  title,
+  description,
+  imageUrl,
+  featuredLabel,
+  viewCodeLabel,
+  viewProjectLabel,
+}) => {
+  const cardRef = useRef(null);
+  const [glow, setGlow] = useState({ x: 0, y: 0, on: false });
+
+  const handleMove = (event) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setGlow({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+      on: true,
+    });
+  };
+
+  return (
+    <motion.article
+      ref={cardRef}
+      onMouseMove={handleMove}
+      onMouseLeave={() => setGlow((current) => ({ ...current, on: false }))}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.08, duration: 0.45 }}
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-2xl dark:border-white/10 dark:bg-gray-800 dark:hover:border-primary-400/40"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute z-30 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl transition-opacity duration-300"
+        style={{
+          left: glow.x,
+          top: glow.y,
+          opacity: glow.on ? 1 : 0,
+          background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(125,211,252,0.55) 42%, rgba(14,165,233,0.05) 70%, transparent 78%)',
+        }}
+      />
+
+      <div className="relative h-52 overflow-hidden">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800">
+            <span className="text-5xl font-semibold text-white/80">{title?.charAt(0) || 'P'}</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-gray-950/10 to-transparent"></div>
+        {project.featured && (
+          <div className="absolute top-4 right-4 z-40 flex items-center space-x-1 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-amber-700 shadow-sm">
+            <FiStar className="h-3.5 w-3.5" />
+            <span>{featuredLabel}</span>
+          </div>
+        )}
+        {project.category && (
+          <span className="absolute bottom-4 left-4 z-40 rounded-full bg-white/15 px-3 py-1 text-xs font-medium uppercase tracking-wide text-white backdrop-blur-sm">
+            {project.category}
+          </span>
+        )}
+      </div>
+
+      <div className="relative z-40 flex flex-1 flex-col p-6">
+        <h3 className="mb-2 text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{title}</h3>
+        <p className="mb-5 line-clamp-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          {description}
+        </p>
+        <div className="mb-5 flex flex-wrap gap-2">
+          {project.technologies?.slice(0, 4).map((tech, techIndex) => (
+            <span
+              key={techIndex}
+              className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:border-primary-800 dark:bg-primary-900/40 dark:text-primary-200"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+        <div className="mt-auto flex items-center gap-3">
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-primary-300 hover:text-primary-700 dark:border-white/10 dark:text-gray-200 dark:hover:border-primary-400 dark:hover:text-primary-300"
+            >
+              <FiGithub className="h-4 w-4" />
+              <span>{viewCodeLabel}</span>
+            </a>
+          )}
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-primary-700"
+            >
+              <FiExternalLink className="h-4 w-4" />
+              <span>{viewProjectLabel}</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  );
+};
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -514,81 +629,17 @@ const Home = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, index) => (
-                <motion.div
+                <ProjectCard
                   key={project._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden group"
-                >
-                  {project.image ? (
-                    <div className="h-48 relative overflow-hidden">
-                      <img 
-                        src={getImageUrl(project.image)} 
-                        alt={getProjectTitle(project)} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                      {project.featured && (
-                        <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 shadow-lg">
-                          <FiStar className="w-3 h-3" />
-                          <span>{t('projects.featured')}</span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="h-48 bg-gradient-to-br from-primary-400 to-primary-600 relative overflow-hidden flex items-center justify-center">
-                      <div className="text-white text-4xl font-bold opacity-50">No Image</div>
-                      {project.featured && (
-                        <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
-                          <FiStar className="w-3 h-3" />
-                          <span>{t('projects.featured')}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold mb-2">{getProjectTitle(project)}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-                      {getProjectDescription(project)}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.technologies?.slice(0, 3).map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 text-xs rounded"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      {project.githubUrl && (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                        >
-                          <FiGithub className="w-5 h-5" />
-                          <span className="text-sm">{t('projects.viewCode')}</span>
-                        </a>
-                      )}
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                        >
-                          <FiExternalLink className="w-5 h-5" />
-                          <span className="text-sm">{t('projects.viewProject')}</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                  project={project}
+                  index={index}
+                  title={getProjectTitle(project)}
+                  description={getProjectDescription(project)}
+                  imageUrl={project.image ? getImageUrl(project.image) : null}
+                  featuredLabel={t('projects.featured')}
+                  viewCodeLabel={t('projects.viewCode')}
+                  viewProjectLabel={t('projects.viewProject')}
+                />
               ))}
             </div>
           )}

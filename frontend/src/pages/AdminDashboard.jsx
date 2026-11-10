@@ -56,6 +56,8 @@ const AdminDashboard = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
@@ -100,16 +102,29 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDelete = async (id, type) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
+  const requestDelete = (id, type, name) => {
+    setDeleteTarget({ id, type, name });
+  };
 
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setDeleting(true);
     try {
-      await api.delete(`/${type}/${id}`);
-      toast.success('Item deleted successfully');
+      await api.delete(`/${deleteTarget.type}/${deleteTarget.id}`);
+      const label = deleteTarget.type === 'projects' ? 'Project' : deleteTarget.type === 'skills' ? 'Skill' : 'Message';
+      toast.success(`${label} deleted`);
+      if (deleteTarget.type === 'messages') {
+        setShowMessageModal(false);
+        setSelectedMessage(null);
+      }
+      setDeleteTarget(null);
       fetchData();
     } catch (error) {
-      toast.error('Error deleting item');
+      toast.error(error.response?.data?.message || 'Could not delete this item');
       console.error('Error:', error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -472,7 +487,7 @@ const AdminDashboard = () => {
                                 <FiEdit className="w-5 h-5" />
                               </button>
                               <button
-                                onClick={() => handleDelete(project._id, 'projects')}
+                                onClick={() => requestDelete(project._id, 'projects', project.title)}
                                 className="p-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
                               >
                                 <FiTrash2 className="w-5 h-5" />
@@ -516,7 +531,7 @@ const AdminDashboard = () => {
                               <FiEdit className="w-5 h-5" />
                             </button>
                             <button
-                              onClick={() => handleDelete(skill._id, 'skills')}
+                              onClick={() => requestDelete(skill._id, 'skills', skill.name)}
                               className="p-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
                             >
                               <FiTrash2 className="w-5 h-5" />
@@ -997,7 +1012,7 @@ const AdminDashboard = () => {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete(message._id, 'messages');
+                                    requestDelete(message._id, 'messages', message.subject);
                                   }}
                                   className="p-1.5 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
                                   title="Delete message"
@@ -1157,11 +1172,7 @@ const AdminDashboard = () => {
                   <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button
                       onClick={() => {
-                        if (window.confirm('Are you sure you want to delete this message?')) {
-                          handleDelete(selectedMessage._id, 'messages');
-                          setShowMessageModal(false);
-                          setSelectedMessage(null);
-                        }
+                        requestDelete(selectedMessage._id, 'messages', selectedMessage.subject);
                       }}
                       className="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors flex items-center space-x-2"
                     >
@@ -1414,6 +1425,43 @@ const AdminDashboard = () => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+
+        {deleteTarget && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6"
+            >
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                {deleteTarget.type === 'projects' ? 'Delete this project?' : deleteTarget.type === 'skills' ? 'Delete this skill?' : 'Delete this message?'}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {deleteTarget.name
+                  ? `"${deleteTarget.name}" will be removed permanently.`
+                  : 'This item will be removed permanently.'}
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deleting}
+                  className="px-5 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
