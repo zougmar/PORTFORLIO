@@ -1417,6 +1417,28 @@ const AdminDashboard = () => {
                       />
                     </div>
                     <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Overview</label>
+                      <textarea
+                        name="overview"
+                        value={formData.overview || ''}
+                        onChange={handleChange}
+                        rows="4"
+                        placeholder="A longer explanation shown on the project page"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Key features</label>
+                      <textarea
+                        name="features"
+                        value={Array.isArray(formData.features) ? formData.features.join('\n') : (formData.features || '')}
+                        onChange={handleChange}
+                        rows="4"
+                        placeholder="One feature per line"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">GitHub URL</label>
                       <input
                         type="url"

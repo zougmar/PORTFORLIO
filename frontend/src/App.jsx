@@ -10,6 +10,7 @@ import Landing from './pages/Landing';
 import About from './pages/About';
 import Skills from './pages/Skills';
 import Projects from './pages/Projects';
+import ProjectDetails from './pages/ProjectDetails';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
@@ -36,6 +37,7 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/skills" element={<Skills />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/experience" element={<Experience />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />

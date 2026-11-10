@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -128,114 +129,9 @@ const ProjectCard = ({
   );
 };
 
-const ProjectDetail = ({ project, title, description, images, onClose, viewCodeLabel, viewProjectLabel }) => {
-  const [active, setActive] = useState(0);
-  const safeIndex = images.length ? Math.min(active, images.length - 1) : 0;
-
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-gray-950/70 p-4" onClick={onClose}>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        onClick={(event) => event.stopPropagation()}
-        className="grid max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-gray-950 md:grid-cols-[1.15fr_0.85fr]"
-      >
-        <div className="bg-gray-100 p-4 dark:bg-gray-900 md:p-6">
-          {images.length ? (
-            <img
-              src={images[safeIndex]}
-              alt={title}
-              className="h-72 w-full rounded-2xl object-cover md:h-[420px]"
-            />
-          ) : (
-            <div className="flex h-72 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-800 md:h-[420px]">
-              <span className="text-6xl font-semibold text-white/80">{title?.charAt(0) || 'P'}</span>
-            </div>
-          )}
-          {images.length > 1 && (
-            <div className="mt-4 flex gap-3 overflow-x-auto">
-              {images.map((image, index) => (
-                <button
-                  key={image}
-                  type="button"
-                  onClick={() => setActive(index)}
-                  className={`h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 ${index === safeIndex ? 'border-primary-500' : 'border-transparent'}`}
-                >
-                  <img src={image} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="relative p-6 md:p-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-4 top-4 rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
-            aria-label="Close"
-          >
-            <FiX className="h-5 w-5" />
-          </button>
-          {project.category && (
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-600 dark:text-primary-300">
-              {project.category}
-            </p>
-          )}
-          <h3 className="mt-3 pr-8 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">{title}</h3>
-          <p className="mt-4 whitespace-pre-line text-sm leading-7 text-gray-600 dark:text-gray-300">{description}</p>
-          {project.technologies?.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {project.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:border-primary-800 dark:bg-primary-900/40 dark:text-primary-200"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          )}
-          <div className="mt-8 flex flex-wrap gap-3">
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm text-gray-700 dark:border-white/10 dark:text-gray-200"
-              >
-                <FiGithub className="h-4 w-4" />
-                {viewCodeLabel}
-              </a>
-            )}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm text-white"
-              >
-                <FiExternalLink className="h-4 w-4" />
-                {viewProjectLabel}
-              </a>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [cvSettings, setCvSettings] = useState({ cvUrlEn: '', cvUrlFr: '' });
@@ -245,7 +141,6 @@ const Home = () => {
   const [experienceEntries, setExperienceEntries] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const [selectedProject, setSelectedProject] = useState(null);
   const [portfolioSettings, setPortfolioSettings] = useState({
     professionalSummary: '',
     professionalSummaryFr: '',
@@ -809,25 +704,13 @@ const Home = () => {
                   viewCodeLabel={t('projects.viewCode')}
                   viewProjectLabel={t('projects.viewProject')}
                   detailsLabel={t('projects.viewDetails')}
-                  onOpen={() => setSelectedProject(project)}
+                  onOpen={() => navigate(`/projects/${project._id}`)}
                 />
               ))}
             </div>
           )}
         </div>
       </section>
-
-      {selectedProject && (
-        <ProjectDetail
-          project={selectedProject}
-          title={getProjectTitle(selectedProject)}
-          description={getProjectDescription(selectedProject)}
-          images={[selectedProject.image, ...(selectedProject.images || [])].filter(Boolean).map(getImageUrl)}
-          onClose={() => setSelectedProject(null)}
-          viewCodeLabel={t('projects.viewCode')}
-          viewProjectLabel={t('projects.viewProject')}
-        />
-      )}
 
       {/* About Section */}
       <section id="about" className="section-padding bg-gray-50 dark:bg-gray-950">

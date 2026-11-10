@@ -42,6 +42,30 @@ const saveGalleryFiles = async (projectId, files = []) => {
   })));
 };
 
+const toList = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (typeof value !== 'string') return [];
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) {
+      return parsed.map((item) => String(item).trim()).filter(Boolean);
+    }
+  } catch (error) {
+    // Plain text is stored as one item per line.
+  }
+  return trimmed.split(/\n|,/).map((item) => item.trim()).filter(Boolean);
+};
+
+const applyDetailFields = (target, body) => {
+  ['features', 'featuresFr', 'featuresAr'].forEach((key) => {
+    if (body[key] !== undefined) target[key] = toList(body[key]);
+  });
+};
+
 const removeGalleryImages = async (projectId, rawIds) => {
   const ids = String(rawIds || '')
     .split(',')
@@ -159,6 +183,7 @@ router.post('/', protect, admin, projectUpload, [
     if (!projectData.category) {
       projectData.category = 'web';
     }
+    applyDetailFields(projectData, req.body);
     
     // Handle technologies array from FormData
     if (req.body.technologies) {
@@ -210,6 +235,7 @@ router.put('/:id', protect, admin, projectUpload, async (req, res, next) => {
     }
 
     const updateData = { ...req.body };
+    applyDetailFields(updateData, req.body);
     
     // Handle technologies array from FormData
     if (req.body.technologies) {

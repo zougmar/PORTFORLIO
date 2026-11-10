@@ -27,6 +27,33 @@ const projectSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  overview: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  overviewFr: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  overviewAr: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  features: [{
+    type: String,
+    trim: true
+  }],
+  featuresFr: [{
+    type: String,
+    trim: true
+  }],
+  featuresAr: [{
+    type: String,
+    trim: true
+  }],
   image: {
     type: String,
     default: ''
