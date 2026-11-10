@@ -130,6 +130,7 @@ const Home = () => {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [skills, setSkills] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [experienceEntries, setExperienceEntries] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [portfolioSettings, setPortfolioSettings] = useState({
@@ -152,9 +153,25 @@ const Home = () => {
     fetchCVSettings();
     fetchSkills();
     fetchProjects();
+    fetchExperiences();
   }, [i18n.language]);
 
   // Fetch user profile data from backend (public endpoint for portfolio)
+  const fetchExperiences = async () => {
+    try {
+      const response = await api.get('/experiences');
+      setExperienceEntries(response.data);
+    } catch (error) {
+      console.error('Error fetching experiences:', error);
+    }
+  };
+
+  const localizedField = (item, field) => {
+    if (i18n.language === 'fr' && item[`${field}Fr`]) return item[`${field}Fr`];
+    if (i18n.language === 'ar' && item[`${field}Ar`]) return item[`${field}Ar`];
+    return item[field] || '';
+  };
+
   const fetchProfileData = async () => {
     try {
       const response = await api.get('/users/profile/public');
@@ -846,7 +863,14 @@ const Home = () => {
             <div className="relative">
               <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-700 transform md:-translate-x-1/2"></div>
 
-              {experiences.map((exp, index) => (
+              {(experienceEntries.length ? experienceEntries.map((item) => ({
+                title: localizedField(item, 'title'),
+                company: localizedField(item, 'organization'),
+                location: localizedField(item, 'location'),
+                period: localizedField(item, 'period'),
+                description: localizedField(item, 'description'),
+                icon: FiBriefcase
+              })) : experiences).map((exp, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}

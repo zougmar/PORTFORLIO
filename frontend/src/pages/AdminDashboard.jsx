@@ -36,6 +36,7 @@ const AdminDashboard = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [experiences, setExperiences] = useState([]);
   const [messages, setMessages] = useState([]);
   const [settings, setSettings] = useState({ 
     cvUrlEn: '', 
@@ -87,6 +88,9 @@ const AdminDashboard = () => {
       } else if (activeTab === 'skills') {
         const response = await api.get('/skills');
         setSkills(response.data);
+      } else if (activeTab === 'experiences') {
+        const response = await api.get('/experiences');
+        setExperiences(response.data);
       } else if (activeTab === 'messages') {
         const response = await api.get('/messages');
         setMessages(response.data);
@@ -112,7 +116,7 @@ const AdminDashboard = () => {
     setDeleting(true);
     try {
       await api.delete(`/${deleteTarget.type}/${deleteTarget.id}`);
-      const label = deleteTarget.type === 'projects' ? 'Project' : deleteTarget.type === 'skills' ? 'Skill' : 'Message';
+      const label = deleteTarget.type === 'projects' ? 'Project' : deleteTarget.type === 'skills' ? 'Skill' : deleteTarget.type === 'experiences' ? 'Entry' : 'Message';
       toast.success(`${label} deleted`);
       if (deleteTarget.type === 'messages') {
         setShowMessageModal(false);
@@ -139,6 +143,9 @@ const AdminDashboard = () => {
       setImagePreview(null);
     } else if (type === 'skills') {
       setFormData({ category: 'language', proficiency: 50 });
+      setImagePreview(null);
+    } else if (type === 'experiences') {
+      setFormData({ type: 'experience', order: experiences.length });
       setImagePreview(null);
     } else {
       setFormData({});
@@ -294,6 +301,7 @@ const AdminDashboard = () => {
 
   const menuItems = [
     { id: 'projects', label: t('admin.projects'), icon: FiBriefcase },
+    { id: 'experiences', label: 'Experience', icon: FiClock },
     { id: 'skills', label: t('admin.skills'), icon: FiCode },
     { id: 'messages', label: t('admin.messages'), icon: FiMail },
     { id: 'cv', label: 'CV Management', icon: FiFileText },
@@ -536,6 +544,59 @@ const AdminDashboard = () => {
                             >
                               <FiTrash2 className="w-5 h-5" />
                             </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Experience & Education Tab */}
+                {activeTab === 'experiences' && (
+                  <div>
+                    <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Experience & Education</h2>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">New entries are added to the list. The current ones stay in place.</p>
+                      </div>
+                      <button
+                        onClick={() => openModal('experiences')}
+                        className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-md"
+                      >
+                        <FiPlus className="w-5 h-5" />
+                        <span>Add entry</span>
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {experiences.map((entry) => (
+                        <div
+                          key={entry._id}
+                          className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-600 dark:text-primary-300">
+                                {entry.type === 'education' ? 'Education' : 'Experience'}
+                              </p>
+                              <h3 className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{entry.title}</h3>
+                              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {[entry.organization, entry.location, entry.period].filter(Boolean).join(' · ')}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => openModal('experiences', entry)}
+                                className="p-2 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 rounded hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors"
+                              >
+                                <FiEdit className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => requestDelete(entry._id, 'experiences', entry.title)}
+                                className="p-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                              >
+                                <FiTrash2 className="w-5 h-5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1203,7 +1264,9 @@ const AdminDashboard = () => {
             >
               <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {editingItem ? t('admin.editProject') : t('admin.addProject')}
+                  {modalType === 'experiences'
+                    ? (editingItem ? 'Edit entry' : 'Add entry')
+                    : (editingItem ? t('admin.editProject') : t('admin.addProject'))}
                 </h2>
                 <button
                   onClick={closeModal}
@@ -1364,6 +1427,65 @@ const AdminDashboard = () => {
                   </>
                 )}
 
+                {modalType === 'experiences' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Type</label>
+                      <select
+                        name="type"
+                        value={formData.type || 'experience'}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      >
+                        <option value="experience">Experience</option>
+                        <option value="education">Education</option>
+                      </select>
+                    </div>
+                    {[
+                      ['title', 'Title (EN)', true],
+                      ['titleFr', 'Title (FR)', false],
+                      ['titleAr', 'Title (AR)', false],
+                      ['organization', 'Company or school (EN)', false],
+                      ['organizationFr', 'Company or school (FR)', false],
+                      ['organizationAr', 'Company or school (AR)', false],
+                      ['location', 'Location (EN)', false],
+                      ['locationFr', 'Location (FR)', false],
+                      ['locationAr', 'Location (AR)', false],
+                      ['period', 'Period (EN)', false],
+                      ['periodFr', 'Period (FR)', false],
+                      ['periodAr', 'Period (AR)', false]
+                    ].map(([name, label, required]) => (
+                      <div key={name}>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">{label}</label>
+                        <input
+                          type="text"
+                          name={name}
+                          value={formData[name] || ''}
+                          onChange={handleChange}
+                          required={required}
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    ))}
+                    {[
+                      ['description', 'Description (EN)'],
+                      ['descriptionFr', 'Description (FR)'],
+                      ['descriptionAr', 'Description (AR)']
+                    ].map(([name, label]) => (
+                      <div key={name}>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">{label}</label>
+                        <textarea
+                          name={name}
+                          value={formData[name] || ''}
+                          onChange={handleChange}
+                          rows="3"
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    ))}
+                  </>
+                )}
+
                 {modalType === 'skills' && (
                   <>
                     <div>
@@ -1437,7 +1559,7 @@ const AdminDashboard = () => {
               className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6"
             >
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                {deleteTarget.type === 'projects' ? 'Delete this project?' : deleteTarget.type === 'skills' ? 'Delete this skill?' : 'Delete this message?'}
+                {deleteTarget.type === 'projects' ? 'Delete this project?' : deleteTarget.type === 'skills' ? 'Delete this skill?' : deleteTarget.type === 'experiences' ? 'Delete this entry?' : 'Delete this message?'}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {deleteTarget.name

@@ -1,15 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { FiBriefcase, FiCalendar, FiMapPin } from 'react-icons/fi';
+import api from '../utils/api';
 
 const Experience = () => {
   const { t, i18n } = useTranslation();
+  const [experienceEntries, setExperienceEntries] = useState([]);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    api.get('/experiences')
+      .then((response) => setExperienceEntries(response.data))
+      .catch((error) => console.error('Error fetching experiences:', error));
   }, [i18n.language]);
+
+  const localizedField = (item, field) => {
+    if (i18n.language === 'fr' && item[`${field}Fr`]) return item[`${field}Fr`];
+    if (i18n.language === 'ar' && item[`${field}Ar`]) return item[`${field}Ar`];
+    return item[field] || '';
+  };
 
   const experiences = [
     {
@@ -76,7 +87,14 @@ const Experience = () => {
                 {/* Timeline Line */}
                 <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-700 transform md:-translate-x-1/2"></div>
 
-                {experiences.map((exp, index) => (
+                {(experienceEntries.length ? experienceEntries.map((item) => ({
+                  title: localizedField(item, 'title'),
+                  company: localizedField(item, 'organization'),
+                  location: localizedField(item, 'location'),
+                  period: localizedField(item, 'period'),
+                  description: localizedField(item, 'description'),
+                  icon: FiBriefcase
+                })) : experiences).map((exp, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
