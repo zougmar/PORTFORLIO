@@ -5,18 +5,18 @@ const Footer = () => {
   const { t } = useTranslation();
 
   const links = [
-    { href: '/#about', id: 'about', label: t('nav.about') },
-    { href: '/#skills', id: 'skills', label: t('nav.skills') },
-    { href: '/#projects', id: 'projects', label: t('nav.projects') },
-    { href: '/#contact', id: 'contact', label: t('nav.contact') }
+    { href: '/home#about', id: 'about', label: t('nav.about') },
+    { href: '/home#skills', id: 'skills', label: t('nav.skills') },
+    { href: '/home#projects', id: 'projects', label: t('nav.projects') },
+    { href: '/home#contact', id: 'contact', label: t('nav.contact') }
   ];
 
   const scrollTo = (event, id) => {
     event.preventDefault();
-    if (window.location.pathname === '/') {
+    if (window.location.pathname === '/home') {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = `/#${id}`;
+      window.location.href = `/home#${id}`;
     }
   };
 

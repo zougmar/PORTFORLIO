@@ -59,9 +59,8 @@ const Navbar = () => {
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
   const scrollToSection = (sectionId) => {
-    if (location.pathname !== '/') {
-      // If not on home page, navigate first then scroll
-      window.location.href = `/#${sectionId}`;
+    if (location.pathname !== '/home') {
+      window.location.href = `/home#${sectionId}`;
     } else {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -71,8 +70,9 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  const onLanding = location.pathname === '/' && !scrolled;
+
   const navLinks = [
-    { id: 'home', label: t('nav.home'), action: () => scrollToSection('home') },
     { id: 'about', label: t('nav.about'), action: () => scrollToSection('about') },
     { id: 'professional-summary', label: 'Services', action: () => scrollToSection('professional-summary') },
     { id: 'skills', label: t('nav.skills'), action: () => scrollToSection('skills') },
@@ -95,10 +95,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           <button 
             onClick={() => {
-              if (location.pathname === '/') {
+              if (location.pathname === '/home') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                window.location.href = '/';
+                window.location.href = '/home';
               }
             }}
             className="flex items-center cursor-pointer"
@@ -117,8 +117,10 @@ const Navbar = () => {
                 key={link.id}
                 onClick={link.action}
                 className={`text-sm font-medium transition-colors ${
-                  location.pathname === '/' && window.location.hash === `#${link.id}`
+                  location.pathname === '/home' && window.location.hash === `#${link.id}`
                     ? 'text-primary-600 dark:text-primary-400'
+                    : onLanding
+                    ? 'text-white hover:text-primary-200'
                     : 'text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400'
                 }`}
               >
@@ -213,7 +215,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300"
+            className={`md:hidden p-2 ${onLanding ? 'text-white' : 'text-gray-700 dark:text-gray-300'}`}
           >
             {isOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
           </button>
@@ -235,7 +237,7 @@ const Navbar = () => {
                   key={link.id}
                   onClick={link.action}
                   className={`block w-full text-left py-2 text-sm font-medium ${
-                    location.pathname === '/' && window.location.hash === `#${link.id}`
+                    location.pathname === '/home' && window.location.hash === `#${link.id}`
                       ? 'text-primary-600 dark:text-primary-400'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}

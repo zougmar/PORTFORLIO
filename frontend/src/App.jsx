@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppFloat from './components/WhatsAppFloat';
 import Home from './pages/Home';
+import Landing from './pages/Landing';
 import About from './pages/About';
 import Skills from './pages/Skills';
 import Projects from './pages/Projects';
@@ -29,7 +30,8 @@ function AppContent() {
       {!isAdminRoute && !isAuthRoute && <Navbar />}
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/skills" element={<Skills />} />
           <Route path="/projects" element={<Projects />} />
