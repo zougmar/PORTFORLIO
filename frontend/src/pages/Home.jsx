@@ -16,6 +16,8 @@ const ProjectCard = ({
   featuredLabel,
   viewCodeLabel,
   viewProjectLabel,
+  detailsLabel,
+  onOpen,
 }) => {
   const cardRef = useRef(null);
   const [glow, setGlow] = useState({ x: 0, y: 0, on: false });
@@ -33,13 +35,14 @@ const ProjectCard = ({
   return (
     <motion.article
       ref={cardRef}
+      onClick={onOpen}
       onMouseMove={handleMove}
       onMouseLeave={() => setGlow((current) => ({ ...current, on: false }))}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.08, duration: 0.45 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-2xl dark:border-white/10 dark:bg-gray-800 dark:hover:border-primary-400/40"
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-2xl dark:border-white/10 dark:bg-gray-800 dark:hover:border-primary-400/40"
     >
       <div
         aria-hidden="true"
@@ -93,12 +96,14 @@ const ProjectCard = ({
             </span>
           ))}
         </div>
-        <div className="mt-auto flex items-center gap-3">
+        <div className="mt-auto flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium text-primary-600 dark:text-primary-300">{detailsLabel}</span>
           {project.githubUrl && (
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}
               className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1.5 text-sm text-gray-700 transition-colors hover:border-primary-300 hover:text-primary-700 dark:border-white/10 dark:text-gray-200 dark:hover:border-primary-400 dark:hover:text-primary-300"
             >
               <FiGithub className="h-4 w-4" />
@@ -110,6 +115,7 @@ const ProjectCard = ({
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}
               className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-primary-700"
             >
               <FiExternalLink className="h-4 w-4" />
@@ -119,6 +125,112 @@ const ProjectCard = ({
         </div>
       </div>
     </motion.article>
+  );
+};
+
+const ProjectDetail = ({ project, title, description, images, onClose, viewCodeLabel, viewProjectLabel }) => {
+  const [active, setActive] = useState(0);
+  const safeIndex = images.length ? Math.min(active, images.length - 1) : 0;
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-gray-950/70 p-4" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={(event) => event.stopPropagation()}
+        className="grid max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-gray-950 md:grid-cols-[1.15fr_0.85fr]"
+      >
+        <div className="bg-gray-100 p-4 dark:bg-gray-900 md:p-6">
+          {images.length ? (
+            <img
+              src={images[safeIndex]}
+              alt={title}
+              className="h-72 w-full rounded-2xl object-cover md:h-[420px]"
+            />
+          ) : (
+            <div className="flex h-72 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-800 md:h-[420px]">
+              <span className="text-6xl font-semibold text-white/80">{title?.charAt(0) || 'P'}</span>
+            </div>
+          )}
+          {images.length > 1 && (
+            <div className="mt-4 flex gap-3 overflow-x-auto">
+              {images.map((image, index) => (
+                <button
+                  key={image}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  className={`h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 ${index === safeIndex ? 'border-primary-500' : 'border-transparent'}`}
+                >
+                  <img src={image} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="relative p-6 md:p-8">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
+            aria-label="Close"
+          >
+            <FiX className="h-5 w-5" />
+          </button>
+          {project.category && (
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-600 dark:text-primary-300">
+              {project.category}
+            </p>
+          )}
+          <h3 className="mt-3 pr-8 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">{title}</h3>
+          <p className="mt-4 whitespace-pre-line text-sm leading-7 text-gray-600 dark:text-gray-300">{description}</p>
+          {project.technologies?.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {project.technologies.map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:border-primary-800 dark:bg-primary-900/40 dark:text-primary-200"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-8 flex flex-wrap gap-3">
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm text-gray-700 dark:border-white/10 dark:text-gray-200"
+              >
+                <FiGithub className="h-4 w-4" />
+                {viewCodeLabel}
+              </a>
+            )}
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm text-white"
+              >
+                <FiExternalLink className="h-4 w-4" />
+                {viewProjectLabel}
+              </a>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
@@ -133,6 +245,7 @@ const Home = () => {
   const [experienceEntries, setExperienceEntries] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [portfolioSettings, setPortfolioSettings] = useState({
     professionalSummary: '',
     professionalSummaryFr: '',
@@ -436,8 +549,15 @@ const Home = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pt-20">
-        <div className="container-custom section-padding">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <img
+          src="/images/hero-tech-background.jpg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-right"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-gray-950/80 via-gray-950/50 to-gray-950/10"></div>
+        <div className="container-custom section-padding relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -449,7 +569,7 @@ const Home = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-primary-600 dark:text-primary-400 font-semibold"
+                className="text-primary-300 font-semibold"
               >
                 {t('hero.greeting')}
               </motion.p>
@@ -467,7 +587,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-2xl md:text-3xl text-gray-700 dark:text-gray-300"
+                className="text-2xl md:text-3xl text-white"
               >
                 {t('hero.title')}
               </motion.h2>
@@ -476,7 +596,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="text-lg text-gray-600 dark:text-gray-400 flex items-center space-x-2"
+                className="text-lg text-gray-200 flex items-center space-x-2"
               >
                 <span>📍</span>
                 <span>{t('hero.location')}</span>
@@ -486,7 +606,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="text-gray-600 dark:text-gray-400 max-w-xl"
+                className="text-gray-300 max-w-xl"
               >
                 {t('hero.description')}
               </motion.p>
@@ -513,7 +633,7 @@ const Home = () => {
                 </button>
                 <button
                   onClick={() => scrollToSection('projects')}
-                  className="flex items-center space-x-2 px-6 py-3 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                  className="flex items-center space-x-2 px-6 py-3 text-white hover:text-primary-200 transition-colors"
                 >
                   <span>{t('hero.viewWork')}</span>
                   <FiArrowRight className="w-5 h-5" />
@@ -681,16 +801,30 @@ const Home = () => {
                   index={index}
                   title={getProjectTitle(project)}
                   description={getProjectDescription(project)}
-                  imageUrl={project.image ? getImageUrl(project.image) : null}
+                  imageUrl={project.image ? getImageUrl(project.image) : (project.images?.[0] ? getImageUrl(project.images[0]) : null)}
                   featuredLabel={t('projects.featured')}
                   viewCodeLabel={t('projects.viewCode')}
                   viewProjectLabel={t('projects.viewProject')}
+                  detailsLabel={t('projects.viewDetails')}
+                  onOpen={() => setSelectedProject(project)}
                 />
               ))}
             </div>
           )}
         </div>
       </section>
+
+      {selectedProject && (
+        <ProjectDetail
+          project={selectedProject}
+          title={getProjectTitle(selectedProject)}
+          description={getProjectDescription(selectedProject)}
+          images={[selectedProject.image, ...(selectedProject.images || [])].filter(Boolean).map(getImageUrl)}
+          onClose={() => setSelectedProject(null)}
+          viewCodeLabel={t('projects.viewCode')}
+          viewProjectLabel={t('projects.viewProject')}
+        />
+      )}
 
       {/* About Section */}
       <section id="about" className="section-padding bg-gray-50 dark:bg-gray-950">

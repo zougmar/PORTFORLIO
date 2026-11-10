@@ -55,6 +55,8 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [removedGallery, setRemovedGallery] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -152,6 +154,8 @@ const AdminDashboard = () => {
       setImagePreview(null);
     }
     setImageFile(null);
+    setGalleryFiles([]);
+    setRemovedGallery([]);
     setShowModal(true);
   };
 
@@ -161,6 +165,8 @@ const AdminDashboard = () => {
     setFormData({});
     setImageFile(null);
     setImagePreview(null);
+    setGalleryFiles([]);
+    setRemovedGallery([]);
   };
 
   const handleImageChange = (e) => {
@@ -179,13 +185,15 @@ const AdminDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (modalType === 'projects' && imageFile) {
+      if (modalType === 'projects' && (imageFile || galleryFiles.length || removedGallery.length)) {
         // Use FormData for file upload
         const submitData = new FormData();
         
         // Append all form fields
         Object.keys(formData).forEach(key => {
-          if (key !== 'image') { // Don't include image URL if we have a file
+          if (['images', 'imageData', '_id', '__v', 'createdAt', 'updatedAt'].includes(key)) return;
+          if (key === 'image' && imageFile) return;
+          if (key !== 'image') {
             if (key === 'technologies' && Array.isArray(formData[key])) {
               // Handle technologies array - send as comma-separated string
               submitData.append(key, formData[key].join(','));
@@ -198,7 +206,15 @@ const AdminDashboard = () => {
         });
 
         // Append image file
-        submitData.append('image', imageFile);
+        if (imageFile) submitData.append('image', imageFile);
+        galleryFiles.forEach((file) => submitData.append('images', file));
+        if (removedGallery.length) {
+          const ids = removedGallery.map((url) => {
+            const match = String(url).match(/\/gallery\/([^/?]+)/);
+            return match?.[1] || url;
+          });
+          submitData.append('removeImages', ids.join(','));
+        }
 
         // Use api utility for file uploads (axios handles FormData)
         if (editingItem) {
@@ -1340,6 +1356,43 @@ const AdminDashboard = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                        More images
+                      </label>
+                      <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                        These appear in the project details. You can add up to 8 images.
+                      </p>
+                      {Array.isArray(formData.images) && formData.images.filter((url) => !removedGallery.includes(url)).length > 0 && (
+                        <div className="mb-3 flex flex-wrap gap-3">
+                          {formData.images.filter((url) => !removedGallery.includes(url)).map((url) => (
+                            <div key={url} className="relative">
+                              <img src={url} alt="" className="h-16 w-24 rounded-lg object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => setRemovedGallery((current) => [...current, url])}
+                                className="absolute -right-2 -top-2 rounded-full bg-red-600 p-1 text-white"
+                                aria-label="Remove image"
+                              >
+                                <FiX className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        multiple
+                        onChange={(event) => setGalleryFiles([...event.target.files].slice(0, 8))}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900 dark:file:text-primary-300"
+                      />
+                      {galleryFiles.length > 0 && (
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                          {galleryFiles.length} new image{galleryFiles.length > 1 ? 's' : ''} selected
+                        </p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Title (EN)</label>

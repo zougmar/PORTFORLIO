@@ -1,10 +1,55 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import Project from '../models/Project.js';
+import ProjectImage from '../models/ProjectImage.js';
 import { protect, admin } from '../middleware/auth.js';
 import uploadImage from '../middleware/uploadImage.js';
 
 const router = express.Router();
+const projectUpload = uploadImage.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'images', maxCount: 8 }
+]);
+
+const galleryUrls = (projectId, images) => images.map((image) => (
+  `/api/projects/${projectId}/gallery/${image._id}?v=${new Date(image.updatedAt).getTime()}`
+));
+
+const attachGalleries = async (projects) => {
+  const ids = projects.map((project) => project._id);
+  const images = await ProjectImage.find({ project: { $in: ids } })
+    .select('project updatedAt order')
+    .sort({ order: 1, createdAt: 1 });
+
+  return projects.map((project) => {
+    const projectObj = typeof project.toObject === 'function' ? project.toObject() : { ...project };
+    projectObj.images = galleryUrls(
+      project._id,
+      images.filter((image) => image.project.toString() === project._id.toString())
+    );
+    return projectObj;
+  });
+};
+
+const saveGalleryFiles = async (projectId, files = []) => {
+  if (!files.length) return;
+  const count = await ProjectImage.countDocuments({ project: projectId });
+  await ProjectImage.insertMany(files.map((file, index) => ({
+    project: projectId,
+    data: file.buffer,
+    contentType: file.mimetype || 'image/jpeg',
+    order: count + index
+  })));
+};
+
+const removeGalleryImages = async (projectId, rawIds) => {
+  const ids = String(rawIds || '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+  if (!ids.length) return;
+  await ProjectImage.deleteMany({ _id: { $in: ids }, project: projectId });
+};
 
 // @route   GET /api/projects
 // @desc    Get all projects
@@ -25,11 +70,11 @@ router.get('/', async (req, res, next) => {
     const projectsWithImageUrls = projects.map(project => {
       const projectObj = project.toObject();
       if (imageMap.has(project._id.toString())) {
-        projectObj.image = `/api/projects/${project._id}/image`;
+        projectObj.image = `/api/projects/${project._id}/image?v=${new Date(project.updatedAt).getTime()}`;
       }
       return projectObj;
     });
-    res.json(projectsWithImageUrls);
+    res.json(await attachGalleries(projectsWithImageUrls));
   } catch (error) {
     next(error);
   }
@@ -47,7 +92,7 @@ router.get('/:id/image', async (req, res, next) => {
 
     // Determine content type (default to jpeg)
     res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.setHeader('Cache-Control', req.query.v ? 'public, max-age=86400' : 'no-cache, no-store, must-revalidate');
     res.send(project.imageData);
   } catch (error) {
     next(error);
@@ -67,9 +112,10 @@ router.get('/:id', async (req, res, next) => {
     const projectObj = project.toObject();
     const projectWithImage = await Project.findById(req.params.id).select('imageData');
     if (projectWithImage && projectWithImage.imageData && projectWithImage.imageData.length) {
-      projectObj.image = `/api/projects/${project._id}/image`;
+      projectObj.image = `/api/projects/${project._id}/image?v=${new Date(project.updatedAt).getTime()}`;
     }
-    res.json(projectObj);
+    const [withGallery] = await attachGalleries([projectObj]);
+    res.json(withGallery);
   } catch (error) {
     next(error);
   }
@@ -78,7 +124,26 @@ router.get('/:id', async (req, res, next) => {
 // @route   POST /api/projects
 // @desc    Create new project
 // @access  Private/Admin
-router.post('/', protect, admin, uploadImage.single('image'), [
+router.get('/:id/gallery/:imageId', async (req, res, next) => {
+  try {
+    const image = await ProjectImage.findOne({
+      _id: req.params.imageId,
+      project: req.params.id
+    }).select('data contentType');
+
+    if (!image || !image.data || !image.data.length) {
+      return res.status(404).json({ message: 'Project image not found' });
+    }
+
+    res.setHeader('Content-Type', image.contentType || 'image/jpeg');
+    res.setHeader('Cache-Control', req.query.v ? 'public, max-age=86400' : 'no-cache, no-store, must-revalidate');
+    res.send(image.data);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/', protect, admin, projectUpload, [
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('description').trim().notEmpty().withMessage('Description is required'),
   body('category').optional({ values: 'falsy' }).isIn(['web', 'mobile', 'fullstack', 'other']).withMessage('Invalid category')
@@ -110,18 +175,19 @@ router.post('/', protect, admin, uploadImage.single('image'), [
     }
     
     // If image was uploaded, store in database
-    if (req.file) {
-      projectData.imageData = req.file.buffer;
-      projectData.image = `/api/projects/${null}/image`; // Will be updated after creation
+    const cover = req.files?.image?.[0];
+    if (cover) {
+      projectData.imageData = cover.buffer;
+      projectData.image = '';
     }
 
     const project = await Project.create(projectData);
     
-    // Update image URL with actual project ID
-    if (req.file) {
+    if (cover) {
       project.image = `/api/projects/${project._id}/image`;
       await project.save();
     }
+    await saveGalleryFiles(project._id, req.files?.images || []);
     
     const projectResponse = project.toObject();
     delete projectResponse.imageData;
@@ -135,7 +201,7 @@ router.post('/', protect, admin, uploadImage.single('image'), [
 // @route   PUT /api/projects/:id
 // @desc    Update project
 // @access  Private/Admin
-router.put('/:id', protect, admin, uploadImage.single('image'), async (req, res, next) => {
+router.put('/:id', protect, admin, projectUpload, async (req, res, next) => {
   try {
     const project = await Project.findById(req.params.id);
     
@@ -160,10 +226,16 @@ router.put('/:id', protect, admin, uploadImage.single('image'), async (req, res,
     }
     
     // If new image was uploaded, store in database
-    if (req.file) {
-      updateData.imageData = req.file.buffer;
+    const cover = req.files?.image?.[0];
+    if (cover) {
+      updateData.imageData = cover.buffer;
       updateData.image = `/api/projects/${req.params.id}/image`;
     }
+
+    await removeGalleryImages(req.params.id, req.body.removeImages);
+    await saveGalleryFiles(req.params.id, req.files?.images || []);
+    delete updateData.removeImages;
+    delete updateData.images;
     
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
@@ -191,6 +263,7 @@ router.delete('/:id', protect, admin, async (req, res, next) => {
     }
 
     // Image data is stored in database, will be deleted with project
+    await ProjectImage.deleteMany({ project: req.params.id });
     await Project.findByIdAndDelete(req.params.id);
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {
