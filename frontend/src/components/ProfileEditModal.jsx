@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiX, FiUpload } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 const ProfileEditModal = ({ isOpen, onClose }) => {
@@ -70,14 +69,9 @@ const ProfileEditModal = ({ isOpen, onClose }) => {
         submitData.append('image', imageFile);
       }
 
-      const response = await api.put('/users/profile/me', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      if (response.data.success) {
-        await updateUserProfile(submitData); // Update context
+      const result = await updateUserProfile(submitData);
+
+      if (result.success) {
         toast.success('Profile updated successfully!');
         onClose();
       }

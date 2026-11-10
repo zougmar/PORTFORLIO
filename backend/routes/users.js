@@ -5,6 +5,20 @@ import uploadImage from '../middleware/uploadImage.js';
 
 const router = express.Router();
 
+const profileImageUrl = (user) => {
+  const version = user?.updatedAt ? new Date(user.updatedAt).getTime() : Date.now();
+  return `/api/users/profile/image/public?v=${version}`;
+};
+
+const sendProfileImage = (res, user, versioned) => {
+  res.setHeader('Content-Type', user.imageContentType || 'image/jpeg');
+  res.setHeader(
+    'Cache-Control',
+    versioned ? 'public, max-age=86400' : 'no-cache, no-store, must-revalidate'
+  );
+  res.send(user.imageData);
+};
+
 // @route   GET /api/users
 // @desc    Get all users
 // @access  Private/Admin
@@ -33,7 +47,7 @@ router.get('/profile/public', async (req, res, next) => {
     // Check if admin has image data
     const adminWithImage = await User.findOne({ role: 'admin' }).select('imageData');
     if (adminWithImage && adminWithImage.imageData && adminWithImage.imageData.length) {
-      userObj.image = `/api/users/profile/image/public`;
+      userObj.image = profileImageUrl(adminUser);
     }
     res.json(userObj);
   } catch (error) {
@@ -55,7 +69,7 @@ router.get('/profile/me', protect, async (req, res, next) => {
     // Check if user has image data
     const userWithImage = await User.findById(req.user.id).select('imageData');
     if (userWithImage && userWithImage.imageData && userWithImage.imageData.length) {
-      userObj.image = `/api/users/profile/image/public`; // Use public endpoint for portfolio display
+      userObj.image = profileImageUrl(user);
     }
     res.json(userObj);
   } catch (error) {
@@ -68,15 +82,12 @@ router.get('/profile/me', protect, async (req, res, next) => {
 // @access  Private
 router.get('/profile/image', protect, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select('imageData');
+    const user = await User.findById(req.user.id).select('imageData imageContentType');
     if (!user || !user.imageData || !user.imageData.length) {
       return res.status(404).json({ message: 'Profile image not found' });
     }
 
-    // Determine content type (default to jpeg)
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-    res.send(user.imageData);
+    sendProfileImage(res, user, Boolean(req.query.v));
   } catch (error) {
     next(error);
   }
@@ -88,15 +99,12 @@ router.get('/profile/image', protect, async (req, res, next) => {
 router.get('/profile/image/public', async (req, res, next) => {
   try {
     // Get the admin user (first admin user)
-    const adminUser = await User.findOne({ role: 'admin' }).select('imageData');
+    const adminUser = await User.findOne({ role: 'admin' }).select('imageData imageContentType');
     if (!adminUser || !adminUser.imageData || !adminUser.imageData.length) {
       return res.status(404).json({ message: 'Profile image not found' });
     }
 
-    // Determine content type (default to jpeg)
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-    res.send(adminUser.imageData);
+    sendProfileImage(res, adminUser, Boolean(req.query.v));
   } catch (error) {
     next(error);
   }
@@ -125,16 +133,16 @@ router.put('/profile/me', protect, uploadImage.single('image'), async (req, res,
     // Handle image upload - store in database
     if (req.file) {
       user.imageData = req.file.buffer;
-      user.image = `/api/users/profile/image/public`; // Public URL endpoint for portfolio
+      user.imageContentType = req.file.mimetype || 'image/jpeg';
+      user.image = profileImageUrl({ updatedAt: new Date() });
     }
 
     await user.save();
     const updatedUser = await User.findById(user.id).select('-password -imageData');
     
-    // Add image URL if image exists
     const userObj = updatedUser.toObject();
     if (user.imageData) {
-      userObj.image = `/api/users/profile/image/public`; // Public endpoint
+      userObj.image = profileImageUrl(updatedUser);
     }
     
     res.json({

@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema({
     type: Buffer,
     default: null
   },
+  imageContentType: {
+    type: String,
+    default: 'image/jpeg'
+  },
   location: {
     type: String,
     trim: true

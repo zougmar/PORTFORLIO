@@ -1,15 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { FiMapPin, FiMail, FiPhone, FiUser } from 'react-icons/fi';
+import api from '../utils/api';
 
 const About = () => {
   const { t, i18n } = useTranslation();
+  const [profileImage, setProfileImage] = useState('');
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   }, [i18n.language]);
+
+  useEffect(() => {
+    api.get('/users/profile/public')
+      .then((response) => setProfileImage(response.data?.image || ''))
+      .catch(() => setProfileImage(''));
+  }, []);
 
   const personalInfo = [
     { icon: FiUser, label: t('about.fullName'), value: 'Omar Zouglah' },
@@ -91,7 +99,7 @@ const About = () => {
                   {/* Profile image */}
                   <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
                     <img 
-                      src="/images/my_image.jpeg" 
+                      src={profileImage || "/images/my_image.jpeg"} 
                       alt="Omar Zouglah" 
                       className="w-full h-full object-cover"
                     />
